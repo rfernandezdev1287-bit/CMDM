@@ -90,7 +90,7 @@ export const Dashboard = () => {
     >
       {/* HEADER: STATUS */}
       <GlassCard sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.5 }}>
-        <Typography variant="h6" fontWeight={700} color="primary.main" letterSpacing={1}>
+        <Typography variant="h6" color="primary.main" sx={{ fontWeight: 700, letterSpacing: 1 }}>
           CMDM BÚNKER
         </Typography>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>

@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer, Server as HttpServer } from 'http';
 import { Server } from 'socket.io';
+import path from 'path';
 
 /**
  * SocketServer - Infrastructure Layer
@@ -44,8 +45,19 @@ export class SocketServer {
   }
 
   private setupRoutes(): void {
+    const distPath = path.join(__dirname, '../../../../frontend/dist');
+
+    // 1. Servir archivos estáticos del build del frontend
+    this.app.use(express.static(distPath));
+
+    // 2. Ruta de Salud del Sistema
     this.app.get('/status', (req, res) => {
       res.json({ status: 'online', service: 'CMDM Búnker' });
+    });
+
+    // 3. Catch-all: Re-rutar cualquier otra petición al index.html de React
+    this.app.get('*', (req, res) => {
+      res.sendFile(path.join(distPath, 'index.html'));
     });
   }
 
