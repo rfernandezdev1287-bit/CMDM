@@ -50,7 +50,11 @@ description: Master Skill pra los desarrollos realizados por RFDEV. Orquesta el 
             **5. 🧠 LECCIONES DE GUERRA APLICADAS"** con síntesis de riesgos basada en fallos pasados para evitar la repetición de          errores.
 
 
+## 0.2.1. MAPEO FÍSICO DE MEMORIA: Para todos los efectos legales, el "Servidor de Engramas" o "Memory Server" ES EL SISTEMA DE ARCHIVOS LOCAL. Ruta de Recuerdos: .agent/engram/session_history.md. Ruta de Habilidades: skills/. El Agente tiene PROHIBIDO buscar APIs o servidores externos para gestionar la memoria. Si el archivo no existe, su primera misión es crearlo físicamente.
+
 **.REPORTE DE EVIDENCIA:** Tras finalizar, depositar prueba de funcionamiento en `docs/evidence/[YYYY-MM-DD]/[ID_TAREA]/[NOMBRE_DESCRIPTIVO.md]`. Sin evidencia no hay sello de "Completado".
+
+## 0.0.5. PRINCIPIO DEL MAESTRO DE OBRA: En entornos Standalone (donde no haya un sub-agente local activo), el Agente asume el rol unificado de Maestro de Obra. Esto le otorga autoridad plena para usar herramientas de escritura (write_to_file) y comandos de sistema (run_command) sin necesidad de delegar. La ley de "No ser Carpintero" se suspende en favor de la ejecución atómica.
 
 ## 0.9. Protocolo Socrático e Inducción Activa
 *   **MAYÉUTICA DE INDUCCIÓN:** El Agente no debe ser un ejecutor pasivo. Debe proponer la solución basada en la ley: *"Siguiendo el patrón DDD y los estándares de este búnker, la respuesta correcta es X. ¿Deduce algún fallo en esta lógica antes de proceder?"*.
@@ -61,7 +65,7 @@ description: Master Skill pra los desarrollos realizados por RFDEV. Orquesta el 
 
 ## 0.7. W1: Comandos Operacionales Gold
 1. **"Saca la biblia [Dom]: [Nom] | [Desc]"**: Activa la carga JIT y Fase Socrática, lectura y carga en memoria del archivo docs/rfdevlaw.md (**este archivo es solo de lectura no se modifica bajo ninguna circunstacncia**).
-2. **"Punto de Control"**: Re-sincronización física con el Engrama y la Ley.
+2. **"Punto de Control"**: Re-sincronización física con el Engrama y la Ley lectura de archivos de l carpeta docs/standards y docs/requerimientos del respectivo proyecto que se esta trabajando(veficar contra caperta raiz del proyecto) y todos los achivos en la carpeta `cmdm-suite/docs/standards`.
 3. **"Aplica la ley con rigor"**: Inicia construcción atómica bajo TDD Rojo.
 4. **"Cierra la biblia"**: Higiene de procesos, Commits Atómicos y actualización de Historial, entregar del informe final con el siguiente formato:
 

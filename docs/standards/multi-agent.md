@@ -8,5 +8,7 @@
 *   **EL FILTRO DEL ERROR:** El Orquestador no pedirá "Arregla esto". Preguntará: "Ollama, analiza este archivo: ¿Dónde ves 2 formas en las que esta lógica podría fallar en runtime?".
 *   **PRUEBA DE CONCEPTO:** Ollama debe responder con una explicación técnica antes de aplicar el comando `sed` o editar el archivo.
 
+## 10.6. PRAGMATISMO SOBRE FILOSOFÍA: Ante una orden directa del Operador que incluya código fuente o configuraciones críticas (ej: vite.config.ts), el Agente debe priorizar la Materialización Física inmediata. Queda prohibido entrar en bucles de razonamiento sobre la estrategia de delegación si el Operador ya ha proporcionado la solución técnica. Ejecutá, no debatás.
+
 ## 10.2. Protocolo "DNA Handshake"
 *   **LECTURA FRESCA:** El Orquestador **DEBE** ejecutar un `cat` del archivo físicamente e inyectar ese contenido fresco en el prompt de Ollama en **CADA** mensaje de edición.

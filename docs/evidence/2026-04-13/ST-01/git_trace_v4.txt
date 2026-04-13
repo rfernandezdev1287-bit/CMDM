@@ -1,0 +1,12 @@
+commit 734badfe223a072e84a19c43e0ef383c21ababaa
+Author: Raul Fernandez <raul@onvopay.com>
+Date:   Mon Apr 13 03:30:42 2026 -0600
+
+    refactor: implement SocketServer class and fix binding to 0.0.0.0 (ST-01.4)
+
+ backend/src/index.ts                               | 39 +++++---------
+ .../infrastructure/socket-server/SocketServer.ts   | 59 ++++++++++++++++++++++
+ backend/src/infrastructure/socket-server/index.ts  | 28 ----------
+ docs/evidence/2026-04-13/ST-01/git_trace_v3.txt    | 11 ++++
+ .../2026-04-13/ST-01/handshake_port_9000.md        | 21 ++++++++
+ 5 files changed, 104 insertions(+), 54 deletions(-)
