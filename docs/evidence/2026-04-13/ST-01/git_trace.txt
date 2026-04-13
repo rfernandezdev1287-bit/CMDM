@@ -1,0 +1,26 @@
+commit 79267a9a139b75de725e200878539a74aead31d4
+Author: Raul Fernandez <raul@onvopay.com>
+Date:   Mon Apr 13 02:54:22 2026 -0600
+
+    feat: implement backend core and file-watcher service (ST-01)
+
+ .agent/engram/session_history.md                   | 12 +++
+ .gitignore                                         |  7 ++
+ README.md                                          |  3 +
+ .../application/services/IntercessionService.ts    | 56 ++++++++++++++
+ backend/src/domain/entities/ArchivoAuditado.ts     | 30 ++++++++
+ .../src/infrastructure/file-watcher/FileWatcher.ts | 89 ++++++++++++++++++++++
+ .../file-watcher/FileWatcher.test.ts               | 22 ++++++
+ backend/tsconfig.json                              | 23 ++++++
+ docs/no-leer-prohibido/bkp.md                      | 88 +++++++++++++++++++++
+ docs/requerimientos/01_vision_y_alcance.md         | 24 ++++++
+ docs/requerimientos/02_casos_de_uso.md             | 33 ++++++++
+ docs/requerimientos/03_especificacion_funcional.md | 23 ++++++
+ docs/requerimientos/04_mapa_de_modulos.md          | 25 ++++++
+ docs/skills/rfdevlaw.md                            | 88 +++++++++++++++++++++
+ docs/standards/backend-db.md                       | 16 ++++
+ docs/standards/frontend-ux.md                      | 12 +++
+ docs/standards/multi-agent.md                      | 12 +++
+ docs/standards/naming-git-qa.md                    | 18 +++++
+ openspec/project_context.md                        |  0
+ 19 files changed, 581 insertions(+)

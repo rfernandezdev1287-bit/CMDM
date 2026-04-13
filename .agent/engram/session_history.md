@@ -10,3 +10,8 @@
 |:---|:---|:---:|
 | 2026-04-13 | `/sdd-init` | 🟢 COMPLETADO |
 | 2026-04-13 | Lectura Física Exhaustiva (Ley y Specs) | 🟢 COMPLETADO |
+| 2026-04-13 | Saneamiento ST-01.2.1 (Vulnerabilidades) | 🟢 COMPLETADO |
+
+## 🛡️ ALERTAS DE SEGURIDAD
+- **Incidente:** Vulnerabilidades críticas en `esbuild` y `vite`.
+- **Solución:** `npm audit fix --force`. Versión final de `vitest`: `4.1.4`, `typescript`: `5.9.3`. Se verificó que `moduleResolution: NodeNext` no sufrió roturas.
