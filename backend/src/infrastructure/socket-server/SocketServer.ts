@@ -15,9 +15,24 @@ export class SocketServer {
   constructor() {
     this.app = express();
     this.httpServer = createServer(this.app);
+
+    const allowedOriginsRaw = process.env.ALLOWED_ORIGINS || 'http://localhost:8080,http://192.168.0.3:8080';
+    const allowedOrigins = allowedOriginsRaw.split(',').map(o => o.trim());
+
+    // Express Middleware Custom: Blindaje 403 para Origins no autorizados
+    this.app.use((req, res, next) => {
+      const origin = req.headers.origin;
+      if (origin && !allowedOrigins.includes(origin)) {
+        return res.status(403).json({ error: 'CORS Forbidden: Domain mismatch' });
+      }
+      res.header('Access-Control-Allow-Origin', origin || allowedOrigins[0] || '*');
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+      next();
+    });
+
     this.io = new Server(this.httpServer, {
       cors: {
-        origin: '*',
+        origin: allowedOrigins,
       }
     });
 
@@ -55,5 +70,9 @@ export class SocketServer {
 
   public getIO(): Server {
     return this.io;
+  }
+
+  public getApp(): express.Application {
+    return this.app;
   }
 }

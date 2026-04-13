@@ -17,7 +17,7 @@ export const useCMDM_Socket = () => {
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
+      reconnectionDelayMax: 5000
     });
 
     socketRef.current = socketInstance;
@@ -34,21 +34,23 @@ export const useCMDM_Socket = () => {
     socketInstance.on('connect', handleConnect);
     socketInstance.on('disconnect', handleDisconnect);
 
-    // Sello de Reconexión Ofensiva (Online listener propuesto en ST-02.2)
+    // Sistema Socrático: Reconexión Ofensiva al recuperar red móvil
     const handleNetworkOnline = () => {
-      // Si el equipo vuelve a estar online y el socket está tirado, reactivamos
-      if (socketRef.current && !socketRef.current.connected) {
-        socketRef.current.connect(); 
+      if (socketInstance.disconnected) {
+        socketInstance.connect();
       }
     };
-    
     window.addEventListener('online', handleNetworkOnline);
 
     return () => {
-      // Limpieza de memoria y listeners obligatoria
       socketInstance.off('connect', handleConnect);
       socketInstance.off('disconnect', handleDisconnect);
-      socketInstance.disconnect();
+      
+      // Cleanup seguro: Evitar TypeError en tests y desmontajes tempranos
+      if (socketInstance && typeof socketInstance.disconnect === 'function') {
+        socketInstance.disconnect();
+      }
+      
       window.removeEventListener('online', handleNetworkOnline);
     };
   }, []);
