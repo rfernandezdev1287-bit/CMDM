@@ -1,0 +1,11 @@
+commit 283337775919c8a2c68166243ba8338a3c44a62a
+Author: Raul Fernandez <raul@onvopay.com>
+Date:   Mon Apr 13 03:22:13 2026 -0600
+
+    feat: unify central entry point and fix port to 9000 (ST-01.3)
+
+ backend/package.json                               |  2 +-
+ backend/src/index.ts                               | 42 ++++++++++++++++++++++
+ docs/evidence/2026-04-13/ST-01/git_trace_v2.txt    | 14 ++++++++
+ .../2026-04-13/ST-01/security_sanitation.md        | 23 ++++++++++++
+ 4 files changed, 80 insertions(+), 1 deletion(-)

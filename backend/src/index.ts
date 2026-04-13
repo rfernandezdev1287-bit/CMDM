@@ -1,42 +1,29 @@
 import dotenv from 'dotenv';
-// dotenv.config() DEBE ser lo primero para que el puerto esté disponible en el inicio
+// INSTRUCCIÓN ABSOLUTA: dotenv.config() DEBE ser la primera línea del sistema
 dotenv.config();
 
-import express from 'express';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
+import { SocketServer } from './infrastructure/socket-server/SocketServer';
 import { IntercessionService } from './application/services/IntercessionService';
 import path from 'path';
 
-const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: '*',
-  }
-});
+/**
+ * ENTRY POINT CENTRAL - CMDM Búnker
+ * Orquestación central del sistema de mando.
+ */
 
-// Selección de puerto bajo la Ley RFDEV (Mandato del Arquitecto)
+// 1. Configuración de Puerto (Mandato 9000)
 const PORT = process.env.PORT || 9000;
 
-// Inicialización de la Vigilancia (IntercessionService)
-// Si no hay VIGILANCIA_PATH en .env, usamos la raíz del proyecto
+// 2. Inicialización de la Vigilancia (DDD: Application Service)
 const defaultPath = path.join(__dirname, '..', '..');
 const watchPath = process.env.VIGILANCIA_PATH || defaultPath;
 
 const intercessionService = new IntercessionService(watchPath);
 intercessionService.iniciarVigilancia();
 
-// Configuración de Sockets para el Mando Móvil
-io.on('connection', (socket) => {
-  console.log(`[CMDM Búnker]: Operador conectado (${socket.id})`);
-  
-  socket.on('disconnect', () => {
-    console.log('[CMDM Búnker]: Operador desconectado');
-  });
-});
+// 3. Inicialización del Servidor de Sockets (DDD: Infrastructure)
+const server = new SocketServer();
+server.start(PORT);
 
-// Arranque Atómico
-httpServer.listen(PORT, () => {
-  console.log(`🏛️ CMDM ONLINE | Puerto: ${PORT}`);
-});
+// Nota: El IntercessionService podría eventualmente requerir el IO del server 
+// para emitir eventos en tiempo real al móvil (ST-02).
