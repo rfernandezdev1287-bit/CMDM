@@ -75,6 +75,7 @@ export const useCMDM_Voice = () => {
 
   const synthQueueRef = useRef<SpeechSynthesisUtterance[]>([]);
   const isSpeakingRef = useRef<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const voicesRef = useRef<any[]>([]);
 
   // T-02: Escucha Asíncrona de Voces del SO
@@ -91,40 +92,48 @@ export const useCMDM_Voice = () => {
     }
   }, []);
 
-  // T-01: Módulo Warm-up Síncrono (The Icebreaker) - Bugfix MacOS: No usar text vacío
+  // T-01: Módulo Warm-up Síncrono Bruto
   const desbloquearMotorDeVoz = useCallback(() => {
     if (!window.speechSynthesis) return;
-    const warmupUtterance = new SpeechSynthesisUtterance('x');
-    warmupUtterance.volume = 0; // Mudo pero válido para activar permiso
-    warmupUtterance.rate = 10; // Máxima velocidad para liberar rápido
-    warmupUtterance.pitch = 0;
     
-    // Fallback de reinicio por si el motor nativo quedó ahogado
+    // Purga bruta: Rompiendo cualquier bloqueo zombie en el navegador
+    window.speechSynthesis.cancel();
     window.speechSynthesis.resume();
-    window.speechSynthesis.speak(warmupUtterance);
   }, []);
 
-  // T-04: Cola Asíncrona sin .cancel()
-  const procesarCola = useCallback(() => {
+  // T-03 & T-04: Cola Asíncrona Resiliente con Dead Man's Switch
+  const procesarCola = useCallback(function internalProcess() {
     if (isSpeakingRef.current || synthQueueRef.current.length === 0) return;
 
     const utterance = synthQueueRef.current[0];
     isSpeakingRef.current = true;
 
-    // Callbacks vitalicios para limpiar colas
-    utterance.onend = () => {
+    // Cálculo T-03: Timeout de vida = 100ms por caracter + 2s de gracia base
+    const tiempoEstimadoMs = (utterance.text.length * 100) + 2000;
+    
+    const supervisorTimeout = setTimeout(() => {
+      console.warn('[CMDM TTS]: Dead Man Switch activado. API Nativa silenciada u omitió onend.');
+      window.speechSynthesis.cancel();
+      avanzarCola();
+    }, tiempoEstimadoMs);
+
+    const avanzarCola = () => {
+      clearTimeout(supervisorTimeout);
       synthQueueRef.current.shift(); 
       isSpeakingRef.current = false;
-      procesarCola();
+      internalProcess();
     };
 
+    utterance.onend = () => {
+      avanzarCola();
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     utterance.onerror = (e: any) => {
-      if (e.error !== 'interrupted') {
+      if (e.error !== 'interrupted' && e.error !== 'canceled') {
         console.error('[CMDM TTS]: Error físico en lectura ->', e);
       }
-      synthQueueRef.current.shift();
-      isSpeakingRef.current = false;
-      procesarCola();
+      avanzarCola();
     };
 
     window.speechSynthesis.speak(utterance);

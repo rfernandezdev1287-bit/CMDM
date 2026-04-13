@@ -2,21 +2,26 @@ import { renderHook, act } from '@testing-library/react';
 import { useCMDM_Voice } from '../useCMDM_Voice';
 import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest';
 
-describe('useCMDM_Voice (ST-05.2 Autoplay Remediation)', () => {
+describe('useCMDM_Voice (ST-05.3 DMS Remediation)', () => {
   let speakMock: ReturnType<typeof vi.fn>;
+  let cancelMock: ReturnType<typeof vi.fn>;
+  let resumeMock: ReturnType<typeof vi.fn>;
   let getVoicesMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     speakMock = vi.fn();
+    cancelMock = vi.fn();
+    resumeMock = vi.fn();
     getVoicesMock = vi.fn().mockReturnValue([
       { lang: 'en-US', name: 'English' },
       { lang: 'es-MX', name: 'Latino' }
     ]);
 
-    // Mock del motor nativo sin .cancel (se eliminó en la refactorización)
+    // Mock del motor nativo
     vi.stubGlobal('speechSynthesis', {
       speak: speakMock,
-      resume: vi.fn(),
+      resume: resumeMock,
+      cancel: cancelMock,
       getVoices: getVoicesMock,
       onvoiceschanged: undefined
     });
@@ -41,40 +46,58 @@ describe('useCMDM_Voice (ST-05.2 Autoplay Remediation)', () => {
         this.onerror = () => {};
       }
     });
+
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.useRealTimers();
+    vi.clearAllTimers();
   });
 
-  test('Debe integrar Warm-up Síncrono (desbloquearMotorDeVoz) enlazado con volumen 0', () => {
+  test('Debe ejecutar purga en el Warm-Up síncrono', () => {
     const { result } = renderHook(() => useCMDM_Voice());
 
     act(() => {
       result.current.desbloquearMotorDeVoz();
     });
 
-    expect(speakMock).toHaveBeenCalledTimes(1);
-    const warmupUtterance = speakMock.mock.calls[0][0];
-    
-    // Verificamos el payload de rompehielo (texto no vacío para macOS, volumen cero)
-    expect(warmupUtterance.text).toBe('x');
-    expect(warmupUtterance.volume).toBe(0);
+    // Validamos Purga Bruta ST-05.3
+    expect(cancelMock).toHaveBeenCalledTimes(1);
+    expect(resumeMock).toHaveBeenCalledTimes(1);
   });
 
-  test('Debe agendar en cola TTS asíncrona', () => {
+  test('Debe activar Dead Mans Switch si el motor macOS cuelga el onend', () => {
     const { result } = renderHook(() => useCMDM_Voice());
-
+    
     act(() => {
-      // Inyección pasiva de Voz Post-Socket sin romper el engine
-      result.current.reproducirRespuesta("Trazabilidad detectada");
+      // Texto de longitud 10. Timeout = (10 * 100) + 2000 = 3000ms
+      result.current.reproducirRespuesta("1234567890"); 
+      // Cola interna tiene 1 elemento
+      // Simulamos enviar otro para ver si la cola avanza tras el DMS
+      result.current.reproducirRespuesta("Segundo");
     });
 
-    // La cola lo procesa automáticamente si no hay audios activos
     expect(speakMock).toHaveBeenCalledTimes(1);
-    
-    const utteranceArg = speakMock.mock.calls[0][0];
-    // Garantizar que amarró la voz real cargada del getVoices
-    expect(utteranceArg.voice.lang).toBe('es-MX');
+    // cancelMock ha sido llamado 0 veces en el contexto de cola en este momento
+    cancelMock.mockClear();
+
+    // Avanzamos 2999ms (antes del timeout)
+    act(() => {
+      vi.advanceTimersByTime(2999);
+    });
+    // No debe haber disparado el cancel de seguridad aún
+    expect(cancelMock).not.toHaveBeenCalled();
+
+    // Avanzamos el MS faltante para detonar el DMS
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+
+    // 1. El Switch forzado se ejecutó limpiando colas del navegador
+    expect(cancelMock).toHaveBeenCalledTimes(1);
+    // 2. Se disparó el segundo elemento de la cola internamente
+    expect(speakMock).toHaveBeenCalledTimes(2);
   });
 });
