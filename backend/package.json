@@ -5,7 +5,7 @@
   "main": "dist/infrastructure/socket-server/index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/infrastructure/socket-server/index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
     "test": "vitest run",
     "lint": "eslint src/**/*.ts"

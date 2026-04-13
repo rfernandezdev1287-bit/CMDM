@@ -1,0 +1,14 @@
+commit 4ed2147eba2dc67ed9573b8d830188f448c36ba8
+Author: Raul Fernandez <raul@onvopay.com>
+Date:   Mon Apr 13 03:12:10 2026 -0600
+
+    fix: security sanitation (ST-01.2.1) and backend core consolidation
+
+ .agent/engram/session_history.md                  |    5 +
+ backend/package-lock.json                         | 5163 +++++++++++++++++++++
+ backend/package.json                              |   39 +
+ backend/src/infrastructure/socket-server/index.ts |   28 +
+ docs/evidence/2026-04-13/ST-01/backend_core.md    |   32 +
+ docs/evidence/2026-04-13/ST-01/git_trace.txt      |   26 +
+ package-lock.json                                 |    6 +
+ 7 files changed, 5299 insertions(+)
