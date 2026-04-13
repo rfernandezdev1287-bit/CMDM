@@ -92,13 +92,26 @@ export const useCMDM_Voice = () => {
     }
   }, []);
 
-  // T-01: Módulo Warm-up Síncrono Bruto
+  // T-01: Módulo Warm-up Síncrono (Autoplay Bypass)
   const desbloquearMotorDeVoz = useCallback(() => {
     if (!window.speechSynthesis) return;
     
-    // Purga bruta: Rompiendo cualquier bloqueo zombie en el navegador
+    // 1. Purga cruda de fantasmas anteriores
     window.speechSynthesis.cancel();
-    window.speechSynthesis.resume();
+
+    // 2. Invocación síncrona obligatoria para romper la Ley de Autoplay.
+    // Si no hacemos speak() directamente en el onClick, Chrome bloqueará el sonido del Backend.
+    const warmup = new SpeechSynthesisUtterance('a');
+    warmup.volume = 0.01; // Casi mudo
+    warmup.rate = 10;
+    window.speechSynthesis.speak(warmup);
+
+    // 3. Guillotina preventiva: Cortamos el warmup a los 50ms para 
+    // evitar el infame bug de macOS donde el TTS jamás dispara el evento onend.
+    // Como el backend demora ~200ms en responder, no pisaremos el audio real.
+    setTimeout(() => {
+      window.speechSynthesis.cancel();
+    }, 50);
   }, []);
 
   // T-03 & T-04: Cola Asíncrona Resiliente con Dead Man's Switch

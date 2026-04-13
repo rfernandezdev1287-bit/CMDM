@@ -8,6 +8,8 @@
 - **Regla de evitación (ST-05.1):** En arquitecturas de React (SPA), jamás dejar objetos nativos de hardware (`SpeechSynthesisUtterance`) en variables de scope asíncrono para evitar aniquilación silenciosa por Garbage Collection. Es perentorio el uso de referencias (`useRef`).
 - **Aprendizaje clave (ST-05.2):** La "User Activation Policy" de Chrome bloquea instanciación dura de síntesis de voz desde flujos de red (como Socket recv). Una solución perenne es instanciar un 'Warm-up' mudo sincronizado al evento onClick `enviarOrden`.
 - **Regla de evitación (ST-05.2):** Reemplazar `cancel()` global de la Web Speech API por estrategias de "Queue" (Cola pasiva) dentro de React si el objetivo final no es silenciar de emergencia sino espaciar lecturas.
+- **Aprendizaje clave (ST-05.3):** El motor WebSpeech de macOS falla silenciosamente. **Nunca** delegar el 100% de la lógica a la promesa nativa (`onend`). 
+- **Regla de evitación (ST-05.3):** Usar siempre un supervisor de tiempo (`Dead Mans Switch`) al interactuar con WebSpeech en arquitecturas de colas (SPA) para evitar un System Freeze.
 - **Estado Inicial:** Repositorio Git vinculado a `https://github.com/rfernandezdev1287-bit/CMDM.git`.
 
 ## 🚦 TABLA DE EVENTOS
@@ -22,6 +24,7 @@
 | 2026-04-13 | **ST-03: Dashboard UI & Mando de Cristal** | 🟢 COMPLETADO |
 | 2026-04-13 | **ST-05 & ST-05.1: Voice Engine & TTS Hotfix (Detonado)** | 🟡 ROLLBACK |
 | 2026-04-13 | **ST-05.2: TTS Remediación Definitiva (Warm-Up)** | 🟢 COMPLETADO |
+| 2026-04-13 | **ST-05.3: TTS Supervisor Dead Man's Switch** | 🟢 COMPLETADO |
 
 ## 🛡️ ALERTAS DE SEGURIDAD
 - **Incidentes:** Vulnerabilidades críticas en `esbuild` y `vite`. 

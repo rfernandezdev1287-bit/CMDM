@@ -63,9 +63,13 @@ describe('useCMDM_Voice (ST-05.3 DMS Remediation)', () => {
       result.current.desbloquearMotorDeVoz();
     });
 
-    // Validamos Purga Bruta ST-05.3
-    expect(cancelMock).toHaveBeenCalledTimes(1);
-    expect(resumeMock).toHaveBeenCalledTimes(1);
+    // Avanzamos timer de guillotina (50ms)
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+
+    // Validamos que forzó la cancelación para evitar el cuelgue
+    expect(cancelMock).toHaveBeenCalledTimes(2); // 1 inicial, 1 en el timeout
   });
 
   test('Debe activar Dead Mans Switch si el motor macOS cuelga el onend', () => {
