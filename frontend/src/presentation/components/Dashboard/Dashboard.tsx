@@ -82,7 +82,21 @@ export const Dashboard = () => {
           CMDM BÚNKER
         </Typography>
         <Stack direction="row" spacing={1} alignItems="center">
-          <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: isConnected ? 'success.main' : 'error.main', boxShadow: isConnected ? '0 0 10px #4caf50' : 'none' }} />
+          <Box 
+            sx={{ 
+              width: 10, 
+              height: 10, 
+              borderRadius: '50%', 
+              bgcolor: isConnected ? 'success.main' : 'error.main', 
+              boxShadow: isConnected ? '0 0 10px #4caf50' : '0 0 10px #f44336',
+              animation: isConnected ? 'none' : 'pulse 1.5s infinite',
+              '@keyframes pulse': {
+                '0%': { opacity: 1 },
+                '50%': { opacity: 0.5 },
+                '100%': { opacity: 1 },
+              }
+            }} 
+          />
           <Typography variant="caption" sx={{ opacity: 0.8, letterSpacing: 0.5 }}>
             {isConnected ? 'ENLAZADO' : 'BUSCANDO TÚNEL'}
           </Typography>
@@ -145,7 +159,12 @@ export const Dashboard = () => {
           value={transcriptText}
           onChange={(e) => setTranscriptText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && enviarOrden()}
-          InputProps={{ disableUnderline: true, sx: { fontFamily: 'monospace', fontSize: '0.95rem', ml: 1 } }}
+          slotProps={{ 
+            input: { 
+              disableUnderline: true, 
+              sx: { fontFamily: 'monospace', fontSize: '0.95rem', ml: 1 } 
+            } 
+          }}
         />
 
         {logs.length > 0 && logs[logs.length - 1].source === 'sys' && (

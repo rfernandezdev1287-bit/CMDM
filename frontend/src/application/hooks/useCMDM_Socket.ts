@@ -19,8 +19,14 @@ export const useCMDM_Socket = () => {
 
     socketRef.current = socketInstance;
 
-    const handleConnect = () => setIsConnected(true);
-    const handleDisconnect = () => setIsConnected(false);
+    const handleConnect = () => {
+      console.log('📡 Socket Conectado');
+      setIsConnected(true);
+    };
+    const handleDisconnect = () => {
+      console.warn('⚠️ Socket Desconectado');
+      setIsConnected(false);
+    };
 
     socketInstance.on('connect', handleConnect);
     socketInstance.on('disconnect', handleDisconnect);
