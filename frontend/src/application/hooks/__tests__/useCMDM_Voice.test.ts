@@ -2,24 +2,22 @@ import { renderHook, act } from '@testing-library/react';
 import { useCMDM_Voice } from '../useCMDM_Voice';
 import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest';
 
-describe('useCMDM_Voice (ST-05.1 TTS Refactor)', () => {
-  let cancelMock: ReturnType<typeof vi.fn>;
+describe('useCMDM_Voice (ST-05.2 Autoplay Remediation)', () => {
   let speakMock: ReturnType<typeof vi.fn>;
   let getVoicesMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    cancelMock = vi.fn();
     speakMock = vi.fn();
     getVoicesMock = vi.fn().mockReturnValue([
       { lang: 'en-US', name: 'English' },
       { lang: 'es-MX', name: 'Latino' }
     ]);
 
-    // Mock del motor nativo
+    // Mock del motor nativo sin .cancel (se eliminó en la refactorización)
     vi.stubGlobal('speechSynthesis', {
-      cancel: cancelMock,
       speak: speakMock,
-      getVoices: getVoicesMock
+      getVoices: getVoicesMock,
+      onvoiceschanged: undefined
     });
 
     // Mock del constructor de Utterance
@@ -28,6 +26,7 @@ describe('useCMDM_Voice (ST-05.1 TTS Refactor)', () => {
       lang: string;
       rate: number;
       pitch: number;
+      volume: number;
       voice: any;
       onend: () => void;
       onerror: (e: any) => void;
@@ -36,48 +35,45 @@ describe('useCMDM_Voice (ST-05.1 TTS Refactor)', () => {
         this.lang = '';
         this.rate = 1;
         this.pitch = 1;
+        this.volume = 1;
         this.onend = () => {};
         this.onerror = () => {};
       }
     });
-
-    vi.useFakeTimers();
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
-    vi.useRealTimers();
   });
 
-  test('Debe mapear la voz nativa, evitar carrera en .cancel() y proteger contra GC', () => {
+  test('Debe integrar Warm-up Síncrono (desbloquearMotorDeVoz) enlazado con volumen 0', () => {
     const { result } = renderHook(() => useCMDM_Voice());
 
     act(() => {
-      result.current.reproducirRespuesta("Prueba de rigor");
+      result.current.desbloquearMotorDeVoz();
     });
 
-    // 1. Inmediatamente debe haber cancelado el buffer viejo
-    expect(cancelMock).toHaveBeenCalledTimes(1);
+    expect(speakMock).toHaveBeenCalledTimes(1);
+    const warmupUtterance = speakMock.mock.calls[0][0];
     
-    // 2. Todavía no debe haber hablado por el delay de 50ms
-    expect(speakMock).not.toHaveBeenCalled();
+    // Verificamos el payload de rompehielo (texto nulo, volumen cero)
+    expect(warmupUtterance.text).toBe('');
+    expect(warmupUtterance.volume).toBe(0);
+  });
 
-    // Avanzamos el reloj artificial 50ms
+  test('Debe agendar en cola TTS asíncrona', () => {
+    const { result } = renderHook(() => useCMDM_Voice());
+
     act(() => {
-      vi.advanceTimersByTime(50);
+      // Inyección pasiva de Voz Post-Socket sin romper el engine
+      result.current.reproducirRespuesta("Trazabilidad detectada");
     });
 
-    // 3. Ahora sí detonó
+    // La cola lo procesa automáticamente si no hay audios activos
     expect(speakMock).toHaveBeenCalledTimes(1);
     
-    // Obtenemos la instancia inyectada a la función
     const utteranceArg = speakMock.mock.calls[0][0];
-    
-    // 4. Verificamos el Hardware Binding (Voz es-MX fue encontrada e inyectada)
+    // Garantizar que amarró la voz real cargada del getVoices
     expect(utteranceArg.voice.lang).toBe('es-MX');
-
-    // 5. Los eventos anti-bug silencioso existen
-    expect(typeof utteranceArg.onend).toBe('function');
-    expect(typeof utteranceArg.onerror).toBe('function');
   });
 });

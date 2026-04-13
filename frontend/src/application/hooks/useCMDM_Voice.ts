@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 // Spanglish Law: Mapeo de objetos experimentales nativos
 declare global {
@@ -73,30 +73,85 @@ export const useCMDM_Voice = () => {
     }
   }, [isListening]);
 
-  // Motor TTS
-  const reproducirRespuesta = useCallback((texto: string) => {
-    if (!('speechSynthesis' in window)) {
-      console.error('El sistema carece de cuerdas vocales (TTS NO soportado).');
-      return;
+  const synthQueueRef = useRef<SpeechSynthesisUtterance[]>([]);
+  const isSpeakingRef = useRef<boolean>(false);
+  const voicesRef = useRef<any[]>([]);
+
+  // T-02: Escucha Asíncrona de Voces del SO
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+
+    const loadVoices = () => {
+      voicesRef.current = window.speechSynthesis.getVoices();
+    };
+
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
     }
+  }, []);
 
-    // Sellado y purga de buffers viejos
-    window.speechSynthesis.cancel();
+  // T-01: Módulo Warm-up Síncrono (The Icebreaker)
+  const desbloquearMotorDeVoz = useCallback(() => {
+    if (!window.speechSynthesis) return;
+    const warmupUtterance = new SpeechSynthesisUtterance('');
+    warmupUtterance.volume = 0; // Mudo pero válido para activar permiso
+    window.speechSynthesis.speak(warmupUtterance);
+  }, []);
 
-    const utterance = new SpeechSynthesisUtterance(texto);
-    utterance.lang = 'es-MX'; // Priorizamos el dialecto hispano estándar
-    utterance.rate = 1.0; 
-    utterance.pitch = 1.0;
+  // T-04: Cola Asíncrona sin .cancel()
+  const procesarCola = useCallback(() => {
+    if (isSpeakingRef.current || synthQueueRef.current.length === 0) return;
+
+    const utterance = synthQueueRef.current[0];
+    isSpeakingRef.current = true;
+
+    // Callbacks vitalicios para limpiar colas
+    utterance.onend = () => {
+      synthQueueRef.current.shift(); 
+      isSpeakingRef.current = false;
+      procesarCola();
+    };
+
+    utterance.onerror = (e: any) => {
+      if (e.error !== 'interrupted') {
+        console.error('[CMDM TTS]: Error físico en lectura ->', e);
+      }
+      synthQueueRef.current.shift();
+      isSpeakingRef.current = false;
+      procesarCola();
+    };
 
     window.speechSynthesis.speak(utterance);
   }, []);
 
+  // Motor TTS Carga Pasiva
+  const reproducirRespuesta = useCallback((texto: string) => {
+    if (!('speechSynthesis' in window)) return;
+
+    const utterance = new SpeechSynthesisUtterance(texto);
+    
+    // Binding Dinámico
+    const vozHispana = voicesRef.current.find(v => v.lang.startsWith('es-')) || voicesRef.current.find(v => v.lang.startsWith('es'));
+    if (vozHispana) {
+      utterance.voice = vozHispana;
+    }
+    
+    utterance.lang = 'es-MX'; // Fallback dialecto
+    utterance.rate = 1.0; 
+    utterance.pitch = 1.0;
+
+    synthQueueRef.current.push(utterance);
+    procesarCola();
+  }, [procesarCola]);
+
   return {
     isListening,
     transcriptText,
-    setTranscriptText, // Expuesto para limpieza manual del Operador
+    setTranscriptText,
     iniciarDictado,
     detenerDictado,
-    reproducirRespuesta
+    reproducirRespuesta,
+    desbloquearMotorDeVoz
   };
 };
