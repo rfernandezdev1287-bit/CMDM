@@ -14,7 +14,7 @@
 | 2026-04-13 | Saneamiento ST-01.2.1 (Vulnerabilidades) | 🟢 COMPLETADO |
 | 2026-04-13 | **ST-01: Backend Core & Watcher** | 🟢 SELLADO |
 | 2026-04-13 | **ST-02.1-RECOVERY (Base Frontend & Theme Gold)** | 🟢 COMPLETADO |
-| 2026-04-13 | **ST-02.2: Voice Engine & Socket Bridge** | 🟡 EN PROCESO |
+| 2026-04-13 | **ST-02.2: Voice Engine & Socket Bridge** | 🟢 COMPLETADO |
 
 ## 🛡️ ALERTAS DE SEGURIDAD
 - **Incidente:** Vulnerabilidades críticas en `esbuild` y `vite`.
