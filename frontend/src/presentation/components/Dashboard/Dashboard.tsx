@@ -16,8 +16,7 @@ export const Dashboard = () => {
     setTranscriptText, 
     iniciarDictado, 
     detenerDictado, 
-    reproducirRespuesta,
-    desbloquearMotorDeVoz
+    reproducirRespuesta
   } = useCMDM_Voice();
 
   // El Buffer Circular de Soberanía
@@ -64,9 +63,6 @@ export const Dashboard = () => {
   const enviarOrden = () => {
     if (!transcriptText.trim()) return;
     
-    // Engrasado sincrónico del canal de voz (Warm-up Autoplay)
-    desbloquearMotorDeVoz();
-
     // Grillar en el DOM visual del Operador localmente antes de remitir
     setLogs((prev) => {
       const log = { id: Date.now().toString(), text: transcriptText, source: 'operador' as const };
