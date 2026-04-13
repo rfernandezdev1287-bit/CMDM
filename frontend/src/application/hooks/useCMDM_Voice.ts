@@ -73,6 +73,8 @@ export const useCMDM_Voice = () => {
     }
   }, [isListening]);
 
+  const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
+
   // Motor TTS
   const reproducirRespuesta = useCallback((texto: string) => {
     if (!('speechSynthesis' in window)) {
@@ -80,15 +82,37 @@ export const useCMDM_Voice = () => {
       return;
     }
 
-    // Sellado y purga de buffers viejos
+    // Sellado y purga de buffers viejos (Race condition flag)
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(texto);
-    utterance.lang = 'es-MX'; // Priorizamos el dialecto hispano estándar
-    utterance.rate = 1.0; 
-    utterance.pitch = 1.0;
+    // Desacople Temporal: Micro-respiro de 50ms al Event Loop de V8
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(texto);
+      
+      // Hardware Binding: Escaneo activo de cuerdas vocales del SO
+      const voces = window.speechSynthesis.getVoices();
+      const vozHispana = voces.find(v => v.lang.startsWith('es-')) || voces.find(v => v.lang.startsWith('es'));
+      
+      if (vozHispana) {
+        utterance.voice = vozHispana;
+      }
+      
+      utterance.lang = 'es-MX'; // Fallback dialecto hispano estándar
+      utterance.rate = 1.0; 
+      utterance.pitch = 1.0;
 
-    window.speechSynthesis.speak(utterance);
+      // Callbacks de ciclo de vida (Anti ceguera silenciosa)
+      utterance.onend = () => {
+        console.log('[CMDM TTS]: Emisión exitosa completada.');
+        synthRef.current = null; // Liberar memoria conscientemente
+      };
+      utterance.onerror = (e) => console.error('[CMDM TTS]: Error físico en lectura ->', e);
+
+      // Blindaje Estructural (Anti-GC): Persistiendo la referencia
+      synthRef.current = utterance;
+
+      window.speechSynthesis.speak(utterance);
+    }, 50);
   }, []);
 
   return {

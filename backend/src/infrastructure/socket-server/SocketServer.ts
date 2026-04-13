@@ -50,6 +50,17 @@ export class SocketServer {
     this.io.on('connection', (socket) => {
       console.log(`[CMDM Búnker]: Operador conectado (${socket.id})`);
       
+      // Listener de la Ley: Recepción de Sockets Frontales (STT Output)
+      socket.on('operador_command', (data: { text: string }) => {
+        console.log(`[CMDM Tracing]: Orden recibida -> "${data.text}"`);
+        
+        // Emisión del acuse transaccional (Eco en el bucle cerrado)
+        // La IA "pesada" (Ollama) tomará control de esta emisión en el próximo módulo.
+        this.io.emit('bunker_response', { 
+          text: `Orden interceptada por el búnker de mando: "${data.text}"` 
+        });
+      });
+
       socket.on('disconnect', () => {
         console.log('[CMDM Búnker]: Operador desconectado');
       });

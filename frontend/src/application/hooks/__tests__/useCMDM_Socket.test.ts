@@ -32,4 +32,18 @@ describe('useCMDM_Socket Security Protocol (ST-03.3)', () => {
     // Como el código real fue despojado de esta armadura, el test colapsará (Sangre Roja).
     expect(io).toHaveBeenCalledWith('https://192.168.0.3:9000', expect.any(Object));
   });
+
+  test('Debe inyectar la cabecera ofensiva "ngrok-skip-browser-warning" para perforar el escudo intersticial de Ngrok free-tier', () => {
+    renderHook(() => useCMDM_Socket());
+
+    // Verificamos que el segundo argumento de io() (las opciones) contenga el header
+    expect(io).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        extraHeaders: expect.objectContaining({
+          "ngrok-skip-browser-warning": expect.any(String)
+        })
+      })
+    );
+  });
 });

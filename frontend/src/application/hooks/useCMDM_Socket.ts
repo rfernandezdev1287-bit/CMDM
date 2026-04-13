@@ -17,7 +17,10 @@ export const useCMDM_Socket = () => {
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000
+      reconnectionDelayMax: 5000,
+      extraHeaders: {
+        "ngrok-skip-browser-warning": "69420"
+      }
     });
 
     socketRef.current = socketInstance;

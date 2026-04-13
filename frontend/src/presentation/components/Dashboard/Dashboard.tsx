@@ -40,6 +40,9 @@ export const Dashboard = () => {
         const newLog = { id: Date.now().toString(), text: data.text, source: 'sys' as const };
         return prev.length >= 100 ? [...prev.slice(1), newLog] : [...prev, newLog];
       });
+      
+      // Auto-TTS: La voz del Búnker
+      reproducirRespuesta(data.text);
     };
 
     const handleStream = (data: { tipo: string, archivo: string, output_procesado: string }) => {
@@ -55,7 +58,7 @@ export const Dashboard = () => {
       socket.off('bunker_response', handleIncomingMessage);
       socket.off('bunker_stream', handleStream);
     };
-  }, [socket]);
+  }, [socket, reproducirRespuesta]);
 
   const enviarOrden = () => {
     if (!transcriptText.trim()) return;
