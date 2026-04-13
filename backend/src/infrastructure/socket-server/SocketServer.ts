@@ -16,7 +16,7 @@ export class SocketServer {
     this.app = express();
     this.httpServer = createServer(this.app);
 
-    const allowedOriginsRaw = process.env.ALLOWED_ORIGINS || 'http://localhost:8080,http://192.168.0.3:8080';
+    const allowedOriginsRaw = process.env.ALLOWED_ORIGINS || 'http://localhost:8080,http://192.168.0.3:8080,https://sympetalous-conformably-colin.ngrok-free.dev';
     const allowedOrigins = allowedOriginsRaw.split(',').map(o => o.trim());
 
     // Express Middleware Custom: Blindaje 403 para Origins no autorizados
@@ -41,7 +41,7 @@ export class SocketServer {
   }
 
   private setupRoutes(): void {
-    this.app.get('/health', (req, res) => {
+    this.app.get('/status', (req, res) => {
       res.json({ status: 'online', service: 'CMDM Búnker' });
     });
   }

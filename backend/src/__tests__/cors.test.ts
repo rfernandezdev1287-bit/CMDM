@@ -11,7 +11,7 @@ describe('CORS Security Protocol (ST-03.3)', () => {
 
   it('Debe devolver 403 (Forbidden) ante un request de origen no autorizado', async () => {
     const res = await request(server.getApp())
-      .get('/health')
+      .get('/status')
       .set('Origin', 'https://malicious-hacker-url.com');
       
     // TDD ROJO: Se espera un 403, pero el Backend (al carecer de blindaje CORS estricto) dejará el origin en '*' y retornará 200.

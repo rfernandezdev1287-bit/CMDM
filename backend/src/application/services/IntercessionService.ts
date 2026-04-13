@@ -2,6 +2,9 @@ import { FileWatcher } from '../../infrastructure/file-watcher/FileWatcher';
 import { ArchivoAuditado } from '../../domain/entities/ArchivoAuditado';
 import path from 'path';
 
+import { Server } from 'socket.io';
+import { CompressionService } from '../../domain/services/CompressionService';
+
 /**
  * IntercessionService - Application Layer
  * Orquestador principal del flujo: 
@@ -9,8 +12,12 @@ import path from 'path';
  */
 export class IntercessionService {
   private watcher: FileWatcher;
+  private compressor = new CompressionService();
 
-  constructor(private readonly targetPath: string) {
+  constructor(
+    private readonly targetPath: string,
+    private readonly io: Server
+  ) {
     this.watcher = new FileWatcher(this.targetPath);
     this.setupListeners();
   }
@@ -41,8 +48,16 @@ export class IntercessionService {
 
     console.log(`[CMDM Trazabilidad]: ${archivoActualizado.obtenerMetadatos()}`);
     
-    // Aquí se dispararía la lógica de persistencia en Engrama o 
-    // el envío vía Sockets al móvil (Módulo ST-02).
+    // El Cerebro (ST-04): Compresión de Válvulas Verbales antes de Enviar
+    const dataFiltrada = this.compressor.comprimir(archivoActualizado.contenidoCrudo);
+    
+    if (dataFiltrada) {
+      this.io.emit('bunker_stream', {
+        tipo: 'engrama',
+        archivo: archivoActualizado.obtenerMetadatos(),
+        output_procesado: dataFiltrada
+      });
+    }
   }
 
   public iniciarVigilancia(): void {

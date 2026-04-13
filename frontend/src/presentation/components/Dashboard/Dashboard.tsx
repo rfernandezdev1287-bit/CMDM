@@ -42,9 +42,18 @@ export const Dashboard = () => {
       });
     };
 
+    const handleStream = (data: { tipo: string, archivo: string, output_procesado: string }) => {
+      setLogs((prev) => {
+        const newLog = { id: Date.now().toString() + Math.random().toString(), text: data.output_procesado, source: 'sys' as const };
+        return prev.length >= 100 ? [...prev.slice(1), newLog] : [...prev, newLog];
+      });
+    };
+
     socket.on('bunker_response', handleIncomingMessage);
+    socket.on('bunker_stream', handleStream);
     return () => {
       socket.off('bunker_response', handleIncomingMessage);
+      socket.off('bunker_stream', handleStream);
     };
   }, [socket]);
 
