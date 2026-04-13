@@ -81,7 +81,7 @@ export const Dashboard = () => {
         <Typography variant="h6" fontWeight={700} color="primary.main" letterSpacing={1}>
           CMDM BÚNKER
         </Typography>
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <Box 
             sx={{ 
               width: 10, 

@@ -7,7 +7,10 @@ export const useCMDM_Socket = () => {
 
   useEffect(() => {
     // Spanglish Architecture: Construcción del endpoint
-    const url_servidor = import.meta.env.VITE_BACKEND_URL || 'http://localhost:9000';
+    let url_servidor = import.meta.env.VITE_BACKEND_URL || 'http://localhost:9000';
+    if (window.location.protocol === 'https:' && url_servidor.startsWith('http://')) {
+      url_servidor = url_servidor.replace('http://', 'https://'); // Socket IO convertirá esto a wss automáticamente
+    }
     
     // Ignición del Socket con política de reconexión ofensiva
     const socketInstance = io(url_servidor, {
