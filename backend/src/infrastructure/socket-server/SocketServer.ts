@@ -16,8 +16,11 @@ export class SocketServer {
     this.app = express();
     this.httpServer = createServer(this.app);
 
-    const allowedOriginsRaw = process.env.ALLOWED_ORIGINS || 'http://localhost:8080,http://192.168.0.3:8080,https://sympetalous-conformably-colin.ngrok-free.dev';
-    const allowedOrigins = allowedOriginsRaw.split(',').map(o => o.trim());
+    const allowedOriginsRaw = process.env.ALLOWED_ORIGINS;
+    if (!allowedOriginsRaw) {
+      console.warn('[CMDM SEGURIDAD]: PELIGRO - ALLOWED_ORIGINS no definido en .env. El búnker denegará peticiones externas.');
+    }
+    const allowedOrigins = allowedOriginsRaw ? allowedOriginsRaw.split(',').map(o => o.trim()) : [];
 
     // Express Middleware Custom: Blindaje 403 para Origins no autorizados
     this.app.use((req, res, next) => {
