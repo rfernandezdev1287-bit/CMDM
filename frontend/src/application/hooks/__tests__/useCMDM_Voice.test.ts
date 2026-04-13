@@ -16,6 +16,7 @@ describe('useCMDM_Voice (ST-05.2 Autoplay Remediation)', () => {
     // Mock del motor nativo sin .cancel (se eliminó en la refactorización)
     vi.stubGlobal('speechSynthesis', {
       speak: speakMock,
+      resume: vi.fn(),
       getVoices: getVoicesMock,
       onvoiceschanged: undefined
     });
@@ -56,8 +57,8 @@ describe('useCMDM_Voice (ST-05.2 Autoplay Remediation)', () => {
     expect(speakMock).toHaveBeenCalledTimes(1);
     const warmupUtterance = speakMock.mock.calls[0][0];
     
-    // Verificamos el payload de rompehielo (texto nulo, volumen cero)
-    expect(warmupUtterance.text).toBe('');
+    // Verificamos el payload de rompehielo (texto no vacío para macOS, volumen cero)
+    expect(warmupUtterance.text).toBe('x');
     expect(warmupUtterance.volume).toBe(0);
   });
 

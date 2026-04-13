@@ -6,6 +6,8 @@
 - **Falla Crítica de Delegación:** Ejecución de código operativo (ST-02.1) omitiendo protocolo estricto de Arquitectura (Plan de Vuelo e Informe Final). Actuar fuera de la Ley compromete la soberanía. Acción correctiva: Restablecimiento de trazabilidad mediante ST-02.1-RECOVERY.
 - **Aprendizaje clave (ST-05.1):** El TTS del motor Google V8 (Chromium) oculta fallos de *race conditions* con el método `.cancel()`. Insertar micro-pausas asíncronas (`setTimeout`) evade el colapso del buffer.
 - **Regla de evitación (ST-05.1):** En arquitecturas de React (SPA), jamás dejar objetos nativos de hardware (`SpeechSynthesisUtterance`) en variables de scope asíncrono para evitar aniquilación silenciosa por Garbage Collection. Es perentorio el uso de referencias (`useRef`).
+- **Aprendizaje clave (ST-05.2):** La "User Activation Policy" de Chrome bloquea instanciación dura de síntesis de voz desde flujos de red (como Socket recv). Una solución perenne es instanciar un 'Warm-up' mudo sincronizado al evento onClick `enviarOrden`.
+- **Regla de evitación (ST-05.2):** Reemplazar `cancel()` global de la Web Speech API por estrategias de "Queue" (Cola pasiva) dentro de React si el objetivo final no es silenciar de emergencia sino espaciar lecturas.
 - **Estado Inicial:** Repositorio Git vinculado a `https://github.com/rfernandezdev1287-bit/CMDM.git`.
 
 ## 🚦 TABLA DE EVENTOS
@@ -18,7 +20,8 @@
 | 2026-04-13 | **ST-02.1-RECOVERY (Base Frontend & Theme Gold)** | 🟢 COMPLETADO |
 | 2026-04-13 | **ST-02.2: Voice Engine & Socket Bridge** | 🟢 COMPLETADO |
 | 2026-04-13 | **ST-03: Dashboard UI & Mando de Cristal** | 🟢 COMPLETADO |
-| 2026-04-13 | **ST-05 & ST-05.1: Voice Engine & TTS Hotfix** | 🟢 COMPLETADO |
+| 2026-04-13 | **ST-05 & ST-05.1: Voice Engine & TTS Hotfix (Detonado)** | 🟡 ROLLBACK |
+| 2026-04-13 | **ST-05.2: TTS Remediación Definitiva (Warm-Up)** | 🟢 COMPLETADO |
 
 ## 🛡️ ALERTAS DE SEGURIDAD
 - **Incidentes:** Vulnerabilidades críticas en `esbuild` y `vite`. 

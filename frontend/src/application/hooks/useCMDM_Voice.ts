@@ -91,11 +91,16 @@ export const useCMDM_Voice = () => {
     }
   }, []);
 
-  // T-01: Módulo Warm-up Síncrono (The Icebreaker)
+  // T-01: Módulo Warm-up Síncrono (The Icebreaker) - Bugfix MacOS: No usar text vacío
   const desbloquearMotorDeVoz = useCallback(() => {
     if (!window.speechSynthesis) return;
-    const warmupUtterance = new SpeechSynthesisUtterance('');
+    const warmupUtterance = new SpeechSynthesisUtterance('x');
     warmupUtterance.volume = 0; // Mudo pero válido para activar permiso
+    warmupUtterance.rate = 10; // Máxima velocidad para liberar rápido
+    warmupUtterance.pitch = 0;
+    
+    // Fallback de reinicio por si el motor nativo quedó ahogado
+    window.speechSynthesis.resume();
     window.speechSynthesis.speak(warmupUtterance);
   }, []);
 
