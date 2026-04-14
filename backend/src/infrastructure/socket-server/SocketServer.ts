@@ -45,13 +45,14 @@ export class SocketServer {
   }
 
   private setupRoutes(): void {
-    const distPath = path.join(__dirname, '../../../../frontend/dist');
+    const distPath = path.resolve(__dirname, '../../../../frontend/dist');
+    console.log(`[CMDM Auditoría]: Sirviendo arsenal desde -> ${distPath}`);
 
     // 1. Servir archivos estáticos del build del frontend
     this.app.use(express.static(distPath));
 
     // 2. Ruta de Salud del Sistema
-    this.app.get('/status', (req, res) => {
+    this.app.get('/status', (_req, res) => {
       res.json({ status: 'online', service: 'CMDM Búnker' });
     });
 

@@ -1,18 +1,49 @@
 import { useState, useRef, useCallback } from 'react';
 
 // Spanglish Law: Mapeo de objetos experimentales nativos
+interface SpeechRecognitionStatic {
+  new (): SpeechRecognition;
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: { error: string }) => void;
+  onend: () => void;
+  start(): void;
+  stop(): void;
+}
+
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  [index: number]: {
+    transcript: string;
+  };
+}
+
+interface SpeechRecognitionEvent {
+  resultIndex: number;
+  results: {
+    length: number;
+    [index: number]: SpeechRecognitionResult;
+  };
+}
+
 declare global {
   interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
+    SpeechRecognition: SpeechRecognitionStatic;
+    webkitSpeechRecognition: SpeechRecognitionStatic;
   }
 }
+
 
 export const useCMDM_Voice = () => {
   const [isListening, setIsListening] = useState(false);
   const [transcriptText, setTranscriptText] = useState('');
   
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   // Inicialización Lazy del Motor de STT
   const getRecognition = () => {
@@ -29,7 +60,7 @@ export const useCMDM_Voice = () => {
     recognition.interimResults = true; // Para ver el flujo en tiempo real (Visual CoT)
     recognition.lang = 'es-ES'; // Ley Cavernícola: Español obligatorio
     
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
       let finalTranscript = '';
 
       for (let i = event.resultIndex; i < event.results.length; ++i) {
@@ -38,19 +69,17 @@ export const useCMDM_Voice = () => {
         }
       }
       
-      // Volcado del buffer a nuestro estado
       if (finalTranscript) {
         setTranscriptText((prev) => (prev ? prev + ' ' + finalTranscript.trim() : finalTranscript.trim()));
       }
     };
 
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event: { error: string }) => {
       console.error('Falla en ignición STT:', event.error);
       setIsListening(false);
     };
 
     recognition.onend = () => {
-      // Cambio de estado reactivo al finalizar captura
       setIsListening(false);
     };
 
@@ -94,7 +123,7 @@ export const useCMDM_Voice = () => {
   return {
     isListening,
     transcriptText,
-    setTranscriptText, // Expuesto para limpieza manual del Operador
+    setTranscriptText, 
     iniciarDictado,
     detenerDictado,
     reproducirRespuesta

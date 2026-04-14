@@ -10,6 +10,15 @@
 - **Regla de evitación (ST-05.2):** Reemplazar `cancel()` global de la Web Speech API por estrategias de "Queue" (Cola pasiva) dentro de React si el objetivo final no es silenciar de emergencia sino espaciar lecturas.
 - **Aprendizaje clave (ST-05.3):** El motor WebSpeech de macOS falla silenciosamente. **Nunca** delegar el 100% de la lógica a la promesa nativa (`onend`). 
 - **Regla de evitación (ST-05.3):** Usar siempre un supervisor de tiempo (`Dead Mans Switch`) al interactuar con WebSpeech en arquitecturas de colas (SPA) para evitar un System Freeze.
+- **Aprendizaje clave (ST-04):** En arquitecturas de Backend (Node v20), ESLint v9 requiere obligatoriamente una configuración física (`eslint.config.mjs`) para habilitar el Sanity Check automático; su ausencia bloquea la soberanía del búnker.
+- **Regla de evitación (ST-04):** Prohibido acceder a valores de `useRef` durante el renderizado en React Hooks; el retorno debe ser estable o a través de un estado para evitar colapsos de memoria y advertencias tácticas.
+- **Aprendizaje clave (Squeeze):** El filtrado agresivo ("Protocolo Cavernícola") de ruido verbal optimiza la ingestión del Arquitecto, reduciendo el overhead de red y aumentando la precisión focal del modelo.
+- **Lección de Guerra (Remediación ST-04.5):** La resolución de rutas estáticas (`dist`) debe centralizarse mediante `path.resolve` para garantizar la soberanía física del búnker independientemente del directorio de trabajo.
+- **Detección Táctica:** El error `NXDOMAIN` es el síntoma inequívoco de un desvío DNS (Typo en el dominio); en este caso, el uso de `.de` en lugar de `.dev` bloqueó el enlace frontal.
+- **Aprendizaje clave (ST-04.7):** El compilador de TypeScript (v5.9+) no incluye definiciones nativas para `SpeechRecognition` por ser una API experimental. Es perentorio declarar interfaces explícitas (`SpeechRecognitionStatic`, `SpeechRecognition`) para garantizar la homogeneidad del build de producción.
+- **Aprendizaje clave (ST-04.8):** El error `ERR_SSL_PROTOCOL_ERROR` se produce por asimetría de protocolos. En entornos seguros (HTTPS/ngrok), el `backend_url` debe ser siempre la URL del túnel con terminación SSL, incluso desde localhost, para evitar bloqueos del navegador.
+- **Aprendizaje clave (ST-04.9):** El motor de compresión ("Squeeze") requiere una estrategia de **Lista Negra** (eliminar ruido verbal explícito) en lugar de una Lista Blanca restrictiva. Esto permite que las observaciones fácticas y anotaciones de trazabilidad fluyan hacia la UI sin ser amputadas por el algoritmo.
+- **Regla de evitación (ST-04.7):** Prohibido duplicar propiedades en los mocks de tests de hardware; la duplicidad bloquea catastróficamente el proceso de buildeo estricto (`tsc -b`).
 - **Estado Inicial:** Repositorio Git vinculado a `https://github.com/rfernandezdev1287-bit/CMDM.git`.
 
 ## 🚦 TABLA DE EVENTOS
@@ -25,6 +34,13 @@
 | 2026-04-13 | **ST-05 & ST-05.1: Voice Engine & TTS Hotfix (Detonado)** | 🟡 ROLLBACK |
 | 2026-04-13 | **ST-05.2: TTS Remediación Definitiva (Warm-Up)** | 🟢 COMPLETADO |
 | 2026-04-13 | **ST-05.3: TTS Supervisor Dead Man's Switch** | 🟢 COMPLETADO |
+| 2026-04-13 | **ST-04: Cerebro de Intercesión & Squeeze Engine** | 🟢 SELLADO |
+| 2026-04-13 | **ST-04.1: Saneamiento de Calidad (Sanity Check)** | 🟢 COMPLETADO |
+| 2026-04-13 | **ST-03.7: Puente de Rigor (Live Proxy)** | 🔴 ABORTADO |
+| 2026-04-13 | **ST-04.5: Auditoría de Arsenal y Remediación** | 🟢 SELLADO |
+| 2026-04-13 | **ST-04.7: Remediación de Tipado y Arsenal Estático** | 🟢 SELLADO |
+| 2026-04-13 | **ST-04.8: Resolución de Conflicto SSL y Enlace Soberano** | 🟢 SELLADO |
+| 2026-04-13 | **ST-04.9: Refinamiento del Cerebro de Intercesión** | 🟢 SELLADO |
 
 ## 🛡️ ALERTAS DE SEGURIDAD
 - **Incidentes:** Vulnerabilidades críticas en `esbuild` y `vite`. 
@@ -32,4 +48,9 @@
 - **Aprendizaje (ST-03.3):** "El desarrollo impulsado por pruebas (TDD) no es un extra; es la fundación de la soberanía. Entregar código funcional pero no testable o carente de scripts en el manifiesto (`package.json`) genera deuda técnica y omisión de protocolos."
 
 
-raul estuvo aqui!!
+rfdev estuvo aquí, prueba final búnker 2222 44 55La IA está probando sincronización: Mon Apr 13 18:02:15 CST 2026
+Hito Socrático de Sincronización: Mon Apr 13 18:03:30 CST 2026
+Certificación de Sincronización Socrática: Mon Apr 13 18:04:13 CST 2026
+Prueba Final de Sincronización (Fix contenido_bruto): Mon Apr 13 18:04:48 CST 2026
+Test Watcher: Mon Apr 13 18:11:24 CST 2026 test
+Verificación Socrática Final: Mon Apr 13 18:19:49 CST 2026 ffff

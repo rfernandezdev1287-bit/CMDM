@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 
 export const useCMDM_Socket = () => {
   const [isConnected, setIsConnected] = useState(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
@@ -24,6 +25,8 @@ export const useCMDM_Socket = () => {
     });
 
     socketRef.current = socketInstance;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSocket(socketInstance);
 
     const handleConnect = () => {
       console.log('📡 Socket Conectado');
@@ -49,7 +52,6 @@ export const useCMDM_Socket = () => {
       socketInstance.off('connect', handleConnect);
       socketInstance.off('disconnect', handleDisconnect);
       
-      // Cleanup seguro: Evitar TypeError en tests y desmontajes tempranos
       if (socketInstance && typeof socketInstance.disconnect === 'function') {
         socketInstance.disconnect();
       }
@@ -58,5 +60,5 @@ export const useCMDM_Socket = () => {
     };
   }, []);
 
-  return { socket: socketRef.current, isConnected };
+  return { socket, isConnected };
 };

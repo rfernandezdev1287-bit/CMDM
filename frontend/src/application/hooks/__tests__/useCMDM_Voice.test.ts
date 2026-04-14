@@ -28,9 +28,10 @@ describe('useCMDM_Voice (ST-05.1 TTS Refactor)', () => {
       lang: string;
       rate: number;
       pitch: number;
-      voice: any;
+
+      voice: SpeechSynthesisVoice | null = null;
       onend: () => void;
-      onerror: (e: any) => void;
+      onerror: (e: { error: string }) => void;
       constructor(text: string) {
         this.text = text;
         this.lang = '';

@@ -7,9 +7,13 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import { GlassCard } from '../shared/GlassCard';
 import { useCMDM_Voice } from '../../../application/hooks/useCMDM_Voice';
 import { useCMDM_Socket } from '../../../application/hooks/useCMDM_Socket';
+import { useCMDM_Intercession } from '../../../application/hooks/useCMDM_Intercession';
+import HubIcon from '@mui/icons-material/Hub';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 export const Dashboard = () => {
   const { isConnected, socket } = useCMDM_Socket();
+  const { capturarContexto, isCapturing } = useCMDM_Intercession(socket);
   const { 
     isListening, 
     transcriptText, 
@@ -76,6 +80,11 @@ export const Dashboard = () => {
     setTranscriptText('');
   };
 
+  const copiarAlPortapapeles = (text: string) => {
+    navigator.clipboard.writeText(text);
+    console.log('[CMDM]: Log copiado.');
+  };
+
   return (
     <Box 
       sx={{ 
@@ -90,9 +99,24 @@ export const Dashboard = () => {
     >
       {/* HEADER: STATUS */}
       <GlassCard sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.5 }}>
-        <Typography variant="h6" color="primary.main" sx={{ fontWeight: 700, letterSpacing: 1 }}>
-          CMDM BÚNKER
-        </Typography>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+          <Typography variant="h6" color="primary.main" sx={{ fontWeight: 700, letterSpacing: 1 }}>
+            CMDM BÚNKER
+          </Typography>
+          <IconButton 
+            size="small" 
+            color={isCapturing ? 'secondary' : 'primary'} 
+            onClick={() => capturarContexto(90)} // Captura de los últimos 90 segundos
+            disabled={!isConnected || isCapturing}
+            sx={{ 
+              bgcolor: 'rgba(0, 255, 204, 0.05)',
+              border: '1px solid rgba(0, 255, 204, 0.2)'
+            }}
+          >
+            {isCapturing ? <CircularProgress size={20} /> : <HubIcon />}
+          </IconButton>
+        </Stack>
+
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <Box 
             sx={{ 
@@ -147,7 +171,18 @@ export const Dashboard = () => {
                   borderRight: log.source === 'operador' ? '3px solid #FFD700' : 'none'
                 }}
               >
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', lineHeight: 1.5 }}>{log.text}</Typography>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace', lineHeight: 1.5 }}>
+                  {log.text}
+                </Typography>
+                {log.source === 'sys' && (
+                  <IconButton 
+                    size="small" 
+                    sx={{ alignSelf: 'flex-end', mt: 0.5, p: 0.5, opacity: 0.6 }} 
+                    onClick={() => copiarAlPortapapeles(log.text)}
+                  >
+                    <ContentCopyIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                )}
               </Box>
             ))}
           </Stack>
