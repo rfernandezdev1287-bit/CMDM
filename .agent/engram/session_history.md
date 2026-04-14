@@ -41,11 +41,17 @@
 | 2026-04-13 | **ST-04.7: Remediación de Tipado y Arsenal Estático** | 🟢 SELLADO |
 | 2026-04-13 | **ST-04.8: Resolución de Conflicto SSL y Enlace Soberano** | 🟢 SELLADO |
 | 2026-04-13 | **ST-04.9: Refinamiento del Cerebro de Intercesión** | 🟢 SELLADO |
+| 2026-04-14 | **ST-05: Sincronía Inicial y Sello de Veracidad** | 🟢 SELLADO |
+
+## 🧠 LECCIONES DE GUERRA (ST-05)
+- **Aprendizaje clave (Caveman v3):** La simplificación lingüística agresiva (eliminación de el/la/de/un) no compromete la lógica si se anclan los signos de interrogación y los verbos de deducción.
+- **Aprendizaje clave (Audit):** El firmado forense en `.agent/audit.json` permite al búnker diferenciar entre cambios generados por la IA y contribuciones humanas, garantizando la soberanía de los datos.
+- **Regla de evitación:** Prohibido que la aplicación inicie sin un overlay de sincronización; la incertidumbre del operador respecto al estado del engrama es una vulnerabilidad táctica.
+- **Lección de Trazabilidad:** El uso de alias (`@infrastructure`) en TypeScript resuelve conflictos de `rootDir` al mover tests a subcarpetas de auditoría, manteniendo el build limpio.
 
 ## 🛡️ ALERTAS DE SEGURIDAD
-- **Incidentes:** Vulnerabilidades críticas en `esbuild` y `vite`. 
-- **Solución:** `npm audit fix --force`. Versión final de `vitest`: `4.1.4`, `typescript`: `5.9.3`.
-- **Aprendizaje (ST-03.3):** "El desarrollo impulsado por pruebas (TDD) no es un extra; es la fundación de la soberanía. Entregar código funcional pero no testable o carente de scripts en el manifiesto (`package.json`) genera deuda técnica y omisión de protocolos."
+- **Incidentes:** Resolución de error `TS2322` en `FileWatcher.ts` (Callback tipado estrictamente).
+- **Hito:** Arsenal consolidado vía `git status --porcelain` disponible en Dashboard.
 
 
 rfdev estuvo aquí, prueba final búnker 2222 44 55La IA está probando sincronización: Mon Apr 13 18:02:15 CST 2026

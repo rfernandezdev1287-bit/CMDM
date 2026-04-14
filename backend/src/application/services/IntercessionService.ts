@@ -3,8 +3,11 @@ import { ArchivoAuditado } from '../../domain/entities/ArchivoAuditado';
 import { ArtifactAggregator } from '../../infrastructure/artifact-aggregator/ArtifactAggregator';
 import path from 'path';
 
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { CompressionService } from '../../domain/services/CompressionService';
+import { AuditService } from './AuditService';
+import { CommandRelay } from '../../infrastructure/command-relay/CommandRelay';
+import fs from 'fs';
 
 /**
  * IntercessionService - Application Layer
@@ -15,6 +18,8 @@ export class IntercessionService {
   private watcher: FileWatcher;
   private compressor = new CompressionService();
   private aggregator: ArtifactAggregator;
+  private auditService = new AuditService();
+  private commandRelay = new CommandRelay();
 
   constructor(
     private readonly targetPath: string,
@@ -37,9 +42,58 @@ export class IntercessionService {
 
     // Listener Global de Sockets para el Servicio
     this.io.on('connection', (socket) => {
+      // T-44: Handshake Quirúrgico (Últimas 3 interacciones)
+      this.handleInitialSync(socket);
+
       socket.on('request_capture', (data: { seconds?: number }) => {
         this.handleCaptureRequest(socket, data.seconds || 60);
       });
+
+      // T-50: Consolidación de Artefactos Pro-Auditoría
+      socket.on('request_audit_bundle', () => {
+        this.handleAuditBundleRequest(socket);
+      });
+
+      // T-43: Recibir Órdenes del Operador
+      socket.on('operador_command', (data: { text: string }) => {
+        console.log(`[CMDM Intercesión]: Orden recibida -> "${data.text}"`);
+        this.commandRelay.registrarOrden(data.text, socket.id);
+        
+        // Eco táctico
+        this.io.emit('bunker_response', { 
+          text: `Orden materializada físicamente. Procediendo a la ejecución lógica.` 
+        });
+      });
+    });
+  }
+
+  private handleInitialSync(socket: Socket): void {
+    const historyPath = path.resolve(process.cwd(), '.agent/engram/session_history.md');
+    try {
+      if (fs.existsSync(historyPath)) {
+        const fullContent = fs.readFileSync(historyPath, 'utf8');
+        const lines = fullContent.split('\n').filter(l => !!l.trim());
+        const last3Interactions = lines.slice(-3).join('\n');
+
+        socket.emit('bunker_update', {
+          content: last3Interactions,
+          timestamp: new Date()
+        });
+        console.log(`[CMDM Handshake]: Sincronía inicial enviada (${socket.id})`);
+      }
+    } catch (error) {
+      console.error(`[CMDM Handshake Error]: Falla al leer historial -> ${error}`);
+    }
+  }
+
+  private handleAuditBundleRequest(socket: Socket): void {
+    console.log(`[CMDM Intercesión]: Consolidación de arsenal solicitada.`);
+    const bundle = this.aggregator.recolectarArtefactos();
+    const squeezedBundle = this.compressor.comprimir(bundle);
+
+    socket.emit('audit_bundle_ready', {
+      content: squeezedBundle,
+      timestamp: new Date()
     });
   }
 
@@ -78,6 +132,10 @@ export class IntercessionService {
     // El Cerebro (ST-04): Compresión de Válvulas Verbales antes de Enviar
     const dataFiltrada = this.compressor.comprimir(archivoActualizado.contenido_bruto);
     
+    // T-47: Firmado de cambio si es por la IA (en este flujo, asumimos IA si viene del Watcher de arsenal)
+    // En el futuro, esto se granularizará más.
+    this.auditService.registrarCambio(path.relative(this.targetPath, rawData.path), rawData.content);
+
     console.log(`[CMDM Intercesión]: Data filtrada tras Squeeze (length: ${dataFiltrada.length})`);
 
     if (dataFiltrada) {

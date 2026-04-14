@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 
 export const useCMDM_Socket = () => {
   const [isConnected, setIsConnected] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
@@ -25,20 +26,28 @@ export const useCMDM_Socket = () => {
     });
 
     socketRef.current = socketInstance;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSocket(socketInstance);
 
     const handleConnect = () => {
-      console.log('📡 Socket Conectado');
+      console.log('📡 Socket Conectado - Iniciando Sincronía');
       setIsConnected(true);
+      setIsSyncing(true); // Bloqueo UI para hidratación inicial
     };
+
     const handleDisconnect = () => {
       console.warn('⚠️ Socket Desconectado');
       setIsConnected(false);
+      setIsSyncing(false);
+    };
+
+    const handleBunkerUpdate = () => {
+      console.log('✅ Sincronía Inicial Completada (Handshake ST-05)');
+      setIsSyncing(false);
     };
 
     socketInstance.on('connect', handleConnect);
     socketInstance.on('disconnect', handleDisconnect);
+    socketInstance.on('bunker_update', handleBunkerUpdate);
 
     // Sistema Socrático: Reconexión Ofensiva al recuperar red móvil
     const handleNetworkOnline = () => {
@@ -51,6 +60,7 @@ export const useCMDM_Socket = () => {
     return () => {
       socketInstance.off('connect', handleConnect);
       socketInstance.off('disconnect', handleDisconnect);
+      socketInstance.off('bunker_update', handleBunkerUpdate);
       
       if (socketInstance && typeof socketInstance.disconnect === 'function') {
         socketInstance.disconnect();
@@ -60,5 +70,5 @@ export const useCMDM_Socket = () => {
     };
   }, []);
 
-  return { socket, isConnected };
+  return { socket, isConnected, isSyncing };
 };

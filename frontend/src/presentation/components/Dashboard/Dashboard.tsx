@@ -12,7 +12,7 @@ import HubIcon from '@mui/icons-material/Hub';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 export const Dashboard = () => {
-  const { isConnected, socket } = useCMDM_Socket();
+  const { isConnected, isSyncing, socket } = useCMDM_Socket();
   const { capturarContexto, isCapturing } = useCMDM_Intercession(socket);
   const { 
     isListening, 
@@ -23,9 +23,19 @@ export const Dashboard = () => {
     reproducirRespuesta
   } = useCMDM_Voice();
 
-  // El Buffer Circular de Soberanía
-  const [logs, setLogs] = useState<{ id: string, text: string, source: 'sys' | 'operador' }[]>([]);
+  // El Buffer Circular de Soberanía con Hidratación Criogénica
+  const [logs, setLogs] = useState<{ id: string, text: string, source: 'sys' | 'operador' }[]>(() => {
+    const saved = localStorage.getItem('cmdm_logs');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
+  const [isBundling, setIsBundling] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // T-49: Persistencia Criogénica (Auto-save)
+  useEffect(() => {
+    localStorage.setItem('cmdm_logs', JSON.stringify(logs));
+  }, [logs]);
 
   // Auto-scroll estricto para UX Móvil
   useEffect(() => {
@@ -38,14 +48,21 @@ export const Dashboard = () => {
   useEffect(() => {
     if (!socket) return;
     
+    // T-44: Handshake Inicial - Hidratación de interacciones recientes
+    const handleBunkerUpdate = (data: { content: string }) => {
+      setLogs((prev) => {
+        // Evitar duplicados si ya están en el buffer
+        if (prev.some(l => l.text === data.content)) return prev;
+        const newLog = { id: 'handshake-' + Date.now().toString(), text: data.content, source: 'sys' as const };
+        return prev.length >= 100 ? [...prev.slice(1), newLog] : [...prev, newLog];
+      });
+    };
+
     const handleIncomingMessage = (data: { text: string }) => {
-      // Buffer Circular: Cap máximo de 100 mensajes para blindar el DOM (O(1) memory cap)
       setLogs((prev) => {
         const newLog = { id: Date.now().toString(), text: data.text, source: 'sys' as const };
         return prev.length >= 100 ? [...prev.slice(1), newLog] : [...prev, newLog];
       });
-      
-      // Auto-TTS: La voz del Búnker
       reproducirRespuesta(data.text);
     };
 
@@ -56,18 +73,31 @@ export const Dashboard = () => {
       });
     };
 
+    const handleAuditBundleReady = (data: { content: string }) => {
+      setIsBundling(false);
+      // Grillar el bundle en el log para inspección táctica inmediata
+      setLogs((prev) => {
+        const newLog = { id: 'bundle-' + Date.now(), text: `<<< ARSENAL CONSOLIDADO >>>\n${data.content}`, source: 'sys' as const };
+        return prev.length >= 100 ? [...prev.slice(1), newLog] : [...prev, newLog];
+      });
+    };
+
+    socket.on('bunker_update', handleBunkerUpdate);
     socket.on('bunker_response', handleIncomingMessage);
     socket.on('bunker_stream', handleStream);
+    socket.on('audit_bundle_ready', handleAuditBundleReady);
+
     return () => {
+      socket.off('bunker_update', handleBunkerUpdate);
       socket.off('bunker_response', handleIncomingMessage);
       socket.off('bunker_stream', handleStream);
+      socket.off('audit_bundle_ready', handleAuditBundleReady);
     };
   }, [socket, reproducirRespuesta]);
 
   const enviarOrden = () => {
     if (!transcriptText.trim()) return;
     
-    // Grillar en el DOM visual del Operador localmente antes de remitir
     setLogs((prev) => {
       const log = { id: Date.now().toString(), text: transcriptText, source: 'operador' as const };
       return prev.length >= 100 ? [...prev.slice(1), log] : [...prev, log];
@@ -80,6 +110,12 @@ export const Dashboard = () => {
     setTranscriptText('');
   };
 
+  const solicitarConsolidacion = () => {
+    if (!socket || !isConnected) return;
+    setIsBundling(true);
+    socket.emit('request_audit_bundle');
+  };
+
   const copiarAlPortapapeles = (text: string) => {
     navigator.clipboard.writeText(text);
     console.log('[CMDM]: Log copiado.');
@@ -88,49 +124,64 @@ export const Dashboard = () => {
   return (
     <Box 
       sx={{ 
-        height: '100dvh', // Forzado estricto para navegadores móviles
+        height: '100dvh', 
         display: 'flex', 
         flexDirection: 'column', 
         bgcolor: 'background.default',
         color: 'text.primary',
         p: { xs: 1, sm: 2 },
-        overflow: 'hidden'
+        overflow: 'hidden',
+        position: 'relative'
       }}
     >
+      {/* T-48: OVERLAY DE SINCRONÍA */}
+      {isSyncing && (
+        <Box sx={{
+          position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+          bgcolor: 'rgba(0,0,0,0.8)', zIndex: 9999,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          backdropFilter: 'blur(8px)'
+        }}>
+          <CircularProgress color="primary" sx={{ mb: 2 }} />
+          <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 600 }}>SINCRONIZANDO BÚNKER...</Typography>
+          <Typography variant="caption" sx={{ opacity: 0.7 }}>Protocolo ST-05 | Handshake Quirúrgico</Typography>
+        </Box>
+      )}
+
       {/* HEADER: STATUS */}
       <GlassCard sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.5 }}>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <Typography variant="h6" color="primary.main" sx={{ fontWeight: 700, letterSpacing: 1 }}>
             CMDM BÚNKER
           </Typography>
+          
           <IconButton 
             size="small" 
             color={isCapturing ? 'secondary' : 'primary'} 
-            onClick={() => capturarContexto(90)} // Captura de los últimos 90 segundos
+            onClick={() => capturarContexto(90)}
             disabled={!isConnected || isCapturing}
-            sx={{ 
-              bgcolor: 'rgba(0, 255, 204, 0.05)',
-              border: '1px solid rgba(0, 255, 204, 0.2)'
-            }}
+            sx={{ bgcolor: 'rgba(0, 255, 204, 0.05)', border: '1px solid rgba(0, 255, 204, 0.2)' }}
           >
             {isCapturing ? <CircularProgress size={20} /> : <HubIcon />}
+          </IconButton>
+
+          <IconButton 
+            size="small" 
+            color="primary" 
+            onClick={solicitarConsolidacion}
+            disabled={!isConnected || isBundling}
+            sx={{ bgcolor: 'rgba(255, 215, 0, 0.05)', border: '1px solid rgba(255, 215, 0, 0.2)' }}
+          >
+            {isBundling ? <CircularProgress size={20} /> : <SendIcon sx={{ transform: 'rotate(-90deg)' }} />}
           </IconButton>
         </Stack>
 
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <Box 
             sx={{ 
-              width: 10, 
-              height: 10, 
-              borderRadius: '50%', 
+              width: 10, height: 10, borderRadius: '50%', 
               bgcolor: isConnected ? 'success.main' : 'error.main', 
-              boxShadow: isConnected ? '0 0 10px #4caf50' : '0 0 10px #f44336',
-              animation: isConnected ? 'none' : 'pulse 1.5s infinite',
-              '@keyframes pulse': {
-                '0%': { opacity: 1 },
-                '50%': { opacity: 0.5 },
-                '100%': { opacity: 1 },
-              }
+              boxShadow: isConnected ? '0 0 10px #4caf50' : '0 0 10px #f44336'
             }} 
           />
           <Typography variant="caption" sx={{ opacity: 0.8, letterSpacing: 0.5 }}>
@@ -142,12 +193,8 @@ export const Dashboard = () => {
       {/* BODY: MONITOR DUAL (Buffer Circular) */}
       <GlassCard 
         sx={{ 
-          flexGrow: 1, 
-          display: 'flex', 
-          flexDirection: 'column', 
-          mb: 2, 
-          overflowY: 'auto',
-          scrollBehavior: 'smooth'
+          flexGrow: 1, display: 'flex', flexDirection: 'column', 
+          mb: 2, overflowY: 'auto', scrollBehavior: 'smooth'
         }} 
         ref={scrollRef}
       >
@@ -163,23 +210,17 @@ export const Dashboard = () => {
                 key={log.id} 
                 sx={{ 
                   alignSelf: log.source === 'operador' ? 'flex-end' : 'flex-start',
-                  bgcolor: log.source === 'operador' ? 'rgba(255, 215, 0, 0.15)' : 'rgba(255, 255, 255, 0.05)', // Gold transparente para el humano, blanco tenue para IA
-                  px: 2, py: 1.2,
-                  borderRadius: 2,
-                  maxWidth: '85%',
-                  borderLeft: log.source === 'sys' ? '3px solid #00FFCC' : 'none', // Cyan hint para OLAma/AntiGravity
+                  bgcolor: log.source === 'operador' ? 'rgba(255, 215, 0, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                  px: 2, py: 1.2, borderRadius: 2, maxWidth: '85%',
+                  borderLeft: log.source === 'sys' ? '3px solid #00FFCC' : 'none',
                   borderRight: log.source === 'operador' ? '3px solid #FFD700' : 'none'
                 }}
               >
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', lineHeight: 1.5 }}>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
                   {log.text}
                 </Typography>
                 {log.source === 'sys' && (
-                  <IconButton 
-                    size="small" 
-                    sx={{ alignSelf: 'flex-end', mt: 0.5, p: 0.5, opacity: 0.6 }} 
-                    onClick={() => copiarAlPortapapeles(log.text)}
-                  >
+                  <IconButton size="small" sx={{ alignSelf: 'flex-end', mt: 0.5, p: 0.5, opacity: 0.6 }} onClick={() => copiarAlPortapapeles(log.text)}>
                     <ContentCopyIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 )}
@@ -200,18 +241,10 @@ export const Dashboard = () => {
         </IconButton>
         
         <TextField 
-          fullWidth
-          variant="standard"
-          placeholder="Dictar comando..."
-          value={transcriptText}
-          onChange={(e) => setTranscriptText(e.target.value)}
+          fullWidth variant="standard" placeholder="Dictar comando..."
+          value={transcriptText} onChange={(e) => setTranscriptText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && enviarOrden()}
-          slotProps={{ 
-            input: { 
-              disableUnderline: true, 
-              sx: { fontFamily: 'monospace', fontSize: '0.95rem', ml: 1 } 
-            } 
-          }}
+          slotProps={{ input: { disableUnderline: true, sx: { fontFamily: 'monospace', fontSize: '0.95rem', ml: 1 } } }}
         />
 
         {logs.length > 0 && logs[logs.length - 1].source === 'sys' && (

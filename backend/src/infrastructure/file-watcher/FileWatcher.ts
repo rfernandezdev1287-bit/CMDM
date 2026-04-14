@@ -36,7 +36,7 @@ export class FileWatcher extends EventEmitter {
    */
   public start(): void {
     this.watcher = chokidar.watch(this.targetPath, {
-      ignored: (pathStr, stats) => {
+      ignored: (pathStr: string, stats?: fs.Stats) => {
         // Ignorar directorios de ruido
         if (this.ignoredPaths.some(regex => regex.test(pathStr))) return true;
         

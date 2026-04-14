@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { FileWatcher } from '../../../src/infrastructure/file-watcher/FileWatcher';
+import { FileWatcher } from '@infrastructure/file-watcher/FileWatcher';
 import path from 'path';
 
 describe('FileWatcher (Infrastructure Layer)', () => {
