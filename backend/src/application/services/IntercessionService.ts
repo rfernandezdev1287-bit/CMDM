@@ -68,21 +68,39 @@ export class IntercessionService {
   }
 
   private handleInitialSync(socket: Socket): void {
-    const historyPath = path.resolve(process.cwd(), '.agent/engram/session_history.md');
-    try {
-      if (fs.existsSync(historyPath)) {
-        const fullContent = fs.readFileSync(historyPath, 'utf8');
-        const lines = fullContent.split('\n').filter(l => !!l.trim());
-        const last3Interactions = lines.slice(-3).join('\n');
+    // Trazabilidad de rutas: Priorizar el ESPEJO (mirror.md) sobre el historial técnico
+    const pathsToTry = [
+      path.resolve(process.cwd(), '.agent/engram/mirror.md'),
+      path.resolve(process.cwd(), '../.agent/engram/mirror.md'),
+      path.resolve(process.cwd(), '.agent/engram/session_history.md'),
+    ];
 
-        socket.emit('bunker_update', {
-          content: last3Interactions,
-          timestamp: new Date()
-        });
-        console.log(`[CMDM Handshake]: Sincronía inicial enviada (${socket.id})`);
+    let historyContent = 'Bienvenidos al CMDM. Iniciando sesión de mando...';
+    let found = false;
+
+    try {
+      for (const historyPath of pathsToTry) {
+        if (fs.existsSync(historyPath)) {
+          const fullContent = fs.readFileSync(historyPath, 'utf8');
+          const lines = fullContent.split('\n').filter(l => !!l.trim());
+          if (lines.length > 0) {
+            // Si es el espejo, queremos los últimos mensajes para el feeling de "chat"
+            // Si es el historial, las últimas 3 líneas
+            historyContent = lines.slice(-5).join('\n'); 
+            found = true;
+            break;
+          }
+        }
       }
     } catch (error) {
-      console.error(`[CMDM Handshake Error]: Falla al leer historial -> ${error}`);
+      console.error(`[CMDM Handshake Error]: Falla catastrófica en lectura espejo -> ${error}`);
+    } finally {
+      socket.emit('bunker_update', {
+        content: historyContent,
+        timestamp: new Date(),
+        status: found ? 'synchronized' : 'empty'
+      });
+      console.log(`[CMDM Handshake]: Espejo sincronizado (${found ? 'CON DATOS' : 'SIN DATOS'})`);
     }
   }
 
