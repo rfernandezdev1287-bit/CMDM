@@ -44,6 +44,7 @@
 | 2026-04-14 | **ST-05: Sincronía Inicial y Sello de Veracidad** | 🟢 SELLADO |
 | 2026-04-14 | **ST-08: Blindaje de Jerarquía y Estética Gold** | 🟢 SELLADO |
 | 2026-04-14 | **ST-08.1/08.2: Remediación de Build y Linter** | 🟢 SELLADO |
+| 2026-04-14 | **ST-09.0: Sincronía Vocal y Arsenal de Cristal** | 🟢 SELLADO |
 
 ## 🧠 LECCIONES DE GUERRA (ST-05)
 - **Aprendizaje clave (Caveman v3):** La simplificación lingüística agresiva (eliminación de el/la/de/un) no compromete la lógica si se anclan los signos de interrogación y los verbos de deducción.
@@ -68,3 +69,6 @@ Verificación Socrática Final: Mon Apr 13 18:19:49 CST 2026 ffff
 - **Aprendizaje clave (ST-08.0):** El blindaje de estanqueidad de texto (`overflow-wrap: anywhere`) es vital para evitar el colapso del búnker ante comandos sin espacios en viewports reducidos.
 - **Regla de evitación (ST-08.0):** Prohibido el `scroll-behavior: smooth` durante la expansión de historia prepended; el bypass a `auto` garantiza la estabilidad absoluta del scroll.
 - **Rigor de React 19 (ST-08.1/08.2):** Saneamos el build eliminando estados derivados innecesarios e implementando inicialización perezosa para sockets, garantizando un linter inmaculado.
+- **Aprendizaje clave (ST-09.0):** El motor de voz (TTS) requiere un protocolo de **Encolamiento Nativo (Queue)**. El uso de `cancel()` preventivo aniquila la dualidad de respuesta (Ack + Exec) necesaria para la soberanía del Operador.
+- **Regla de evitación (ST-09.0):** Prohibido tratar código fuente como lenguaje natural. El Squeeze Engine debe implementar **Marcadores de Inviolabilidad** (`<<< ARTIFACT >>>`) para proteger los planos técnicos de la amputación Caveman.
+- **Lección Táctica (ST-09.0):** El botón de Stop debe ser absoluto, silenciando tanto el dictado como la cola de voz pendiente para devolver el control inmediato al Operador.

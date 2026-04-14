@@ -109,15 +109,20 @@ export const useCMDM_Voice = () => {
       return;
     }
 
-    // Sellado y purga de buffers viejos
-    window.speechSynthesis.cancel();
-
     const utterance = new SpeechSynthesisUtterance(texto);
     utterance.lang = 'es-MX'; // Priorizamos el dialecto hispano estándar
     utterance.rate = 1.0; 
     utterance.pitch = 1.0;
 
+    // Protocolo ST-09.0: Permitimos el encolamiento nativo. 
+    // No llamamos a cancel() aquí para que los mensajes secuenciales fluyan.
     window.speechSynthesis.speak(utterance);
+  }, []);
+
+  const silenciarMotor = useCallback(() => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
   }, []);
 
   return {
@@ -126,6 +131,7 @@ export const useCMDM_Voice = () => {
     setTranscriptText, 
     iniciarDictado,
     detenerDictado,
-    reproducirRespuesta
+    reproducirRespuesta,
+    silenciarMotor
   };
 };

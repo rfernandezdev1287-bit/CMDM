@@ -30,7 +30,8 @@ export const Dashboard = () => {
     setTranscriptText, 
     iniciarDictado, 
     detenerDictado, 
-    reproducirRespuesta
+    reproducirRespuesta,
+    silenciarMotor
   } = useCMDM_Voice();
 
   // ST-08.1: REMEDIACIÓN DE BUILD - Refactorización de Estado Derivado
@@ -278,7 +279,7 @@ export const Dashboard = () => {
       {/* FOOTER: CONSOLA */}
       <Box sx={{ flexShrink: 0 }}>
         <GlassCard sx={{ p: 1, display: 'flex', gap: 1, alignItems: 'center' }}>
-          <IconButton color={isListening ? 'error' : 'primary'} onClick={isListening ? detenerDictado : iniciarDictado}>
+          <IconButton color={isListening ? 'error' : 'primary'} onClick={isListening ? () => { detenerDictado(); silenciarMotor(); } : iniciarDictado}>
             {isListening ? <StopIcon /> : <MicIcon />}
           </IconButton>
           <TextField 

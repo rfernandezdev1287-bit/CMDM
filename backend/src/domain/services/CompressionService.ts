@@ -28,50 +28,59 @@ export class CompressionService {
   ];
 
   /**
-   * Algoritmo Squeeze v3 (Caveman Port):
-   * 1. Protege Código de forma absoluta.
+   * Algoritmo Squeeze v3.1 (Arsenal Protect):
+   * 1. Protege Código de forma absoluta dentro de bloques ARTIFACT.
    * 2. Simplifica lenguaje eliminando rellenos, pero ancla las preguntas socráticas.
    */
   public comprimir(textoCrudo: string): string {
     if (!textoCrudo) return '';
     
     const lineas = textoCrudo.split('\n');
+    let isInArtifactBlock = false;
+
     const filtrado = lineas
       .map(linea => {
-        let procesada = linea.trim();
-        if (!procesada) return null;
+        const procesadaOriginal = linea;
+        let procesadaTrimmed = linea.trim();
+        if (!procesadaTrimmed) return null;
+
+        // --- NIVEL 0: PROTECCIÓN DE ARSENAL (Bypass Absoluto) ---
+        if (procesadaTrimmed.startsWith('<<< ARTIFACT:')) {
+          isInArtifactBlock = true;
+          return procesadaOriginal;
+        }
+        if (procesadaTrimmed.startsWith('<<< END ARTIFACT >>>')) {
+          isInArtifactBlock = false;
+          return procesadaOriginal;
+        }
+        if (isInArtifactBlock) {
+          return procesadaOriginal; // Preservamos indentación y contenido técnico
+        }
         
-        // --- NIVEL 1: PROTECCIÓN DE CÓDIGO ---
-        const esCodigo = this.CODE_KEYWORDS.some(k => procesada.startsWith(k)) || 
-                         procesada.startsWith('{') || procesada.startsWith('}');
-        if (esCodigo) return procesada;
+        // --- NIVEL 1: PROTECCIÓN DE CÓDIGO (Lógica de Logs) ---
+        const esCodigo = this.CODE_KEYWORDS.some(k => procesadaTrimmed.startsWith(k)) || 
+                         procesadaTrimmed.startsWith('{') || procesadaTrimmed.startsWith('}');
+        if (esCodigo) return procesadaTrimmed;
 
         // --- NIVEL 2: FILTRADO CAVERNÍCOLA (Squeezing) ---
+        let finalStr = procesadaTrimmed;
         
         // A. Limpieza de Ruido Explícito (Saludos/Cortesías)
-        this.NOISE_PATTERNS.forEach(p => { procesada = procesada.replace(p, ''); });
+        this.NOISE_PATTERNS.forEach(p => { finalStr = finalStr.replace(p, ''); });
 
         // B. Simplificación de Rellenos (Caveman)
-        // Aplicamos a todo lo que no sea código, pero si hay una pregunta (?),
-        // intentamos simplificar la parte no-pregunta o ser cuidadosos.
-        // Por rigor socrático: si la línea es puramente una pregunta, la dejamos.
-        // Si es una mezcla (afirmación + pregunta), simplificamos la afirmación.
-        
-        const partes = procesada.split(/([¿?])/); // Dividir por signos de interrogación
-        procesada = partes.map(parte => {
+        const partes = finalStr.split(/([¿?])/);
+        finalStr = partes.map(parte => {
           if (parte === '¿' || parte === '?') return parte;
-          // Si es un segmento de pregunta (entre ¿ y ?), lo preservamos más
-          const esSegmentoPregunta = procesada.indexOf('¿' + parte + '?') !== -1;
-          
+          const esSegmentoPregunta = finalStr.indexOf('¿' + parte + '?') !== -1;
           if (esSegmentoPregunta) return parte;
 
-          // Simplificación agressiva de fragmentos informativos
           let fragmento = parte;
           this.CAVEMAN_FILLERS.forEach(p => { fragmento = fragmento.replace(p, ''); });
           return fragmento;
         }).join('');
 
-        return procesada.replace(/^[,\s.]+/, '').replace(/[,\s.]+$/, '').replace(/\s+/g, ' ').trim();
+        return finalStr.replace(/^[,\s.]+/, '').replace(/[,\s.]+$/, '').replace(/\s+/g, ' ').trim();
       })
       .filter(l => l !== null && l !== '');
 
