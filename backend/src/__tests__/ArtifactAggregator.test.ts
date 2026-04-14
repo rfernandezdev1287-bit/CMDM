@@ -17,18 +17,18 @@ describe('ArtifactAggregator', () => {
 
   it('debe consolidar archivos modificados detectados por Git', () => {
     // Simular git status --porcelain devolviendo dos archivos
-    (execSync as any).mockReturnValue(Buffer.from('M  src/app.ts\nM  README.md\n'));
+    vi.mocked(execSync).mockReturnValue(Buffer.from('M  src/app.ts\nM  README.md\n') as never);
     
     // Simular existencia y stats
-    (fs.existsSync as any).mockReturnValue(true);
-    (fs.statSync as any).mockReturnValue({ isFile: () => true });
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.statSync).mockReturnValue({ isFile: () => true } as fs.Stats);
 
     // Simular lectura de archivos
-    (fs.readFileSync as any).mockImplementation((path: string) => {
+    vi.mocked(fs.readFileSync).mockImplementation(((path: string) => {
       if (path.includes('src/app.ts')) return 'console.log("hello");';
       if (path.includes('README.md')) return '# Project';
       return '';
-    });
+    }) as never);
 
     const result = aggregator.recolectarArtefactos();
 
@@ -40,10 +40,10 @@ describe('ArtifactAggregator', () => {
   });
 
   it('debe ignorar archivos que no estén en la whitelist', () => {
-    (execSync as any).mockReturnValue(Buffer.from('M  image.png\nM  src/logic.ts\n'));
-    (fs.existsSync as any).mockReturnValue(true);
-    (fs.statSync as any).mockReturnValue({ isFile: () => true });
-    (fs.readFileSync as any).mockReturnValue('code');
+    vi.mocked(execSync).mockReturnValue(Buffer.from('M  image.png\nM  src/logic.ts\n') as never);
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.statSync).mockReturnValue({ isFile: () => true } as fs.Stats);
+    vi.mocked(fs.readFileSync).mockReturnValue('code' as never);
 
     const result = aggregator.recolectarArtefactos();
     

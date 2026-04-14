@@ -2,6 +2,17 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
+interface AuditRecord {
+  path: string;
+  hash: string;
+  timestamp: string;
+  author: string;
+}
+
+interface AuditData {
+  files: AuditRecord[];
+}
+
 /**
  * AuditService - Application Layer
  * Responsable de firmar y persistir el historial de cambios de la IA.
@@ -30,10 +41,10 @@ export class AuditService {
    */
   public registrarCambio(relPath: string, contenido: string): void {
     try {
-      const data = JSON.parse(fs.readFileSync(this.auditPath, 'utf8'));
+      const data = JSON.parse(fs.readFileSync(this.auditPath, 'utf8')) as AuditData;
       const hash = crypto.createHash('sha256').update(contenido).digest('hex');
       
-      const registroIndex = data.files.findIndex((f: any) => f.path === relPath);
+      const registroIndex = data.files.findIndex((f) => f.path === relPath);
       const nuevoRegistro = {
         path: relPath,
         hash: hash,
@@ -59,8 +70,8 @@ export class AuditService {
    */
   public esCambioIA(relPath: string, contenidoActual: string): boolean {
     try {
-      const data = JSON.parse(fs.readFileSync(this.auditPath, 'utf8'));
-      const registro = data.files.find((f: any) => f.path === relPath);
+      const data = JSON.parse(fs.readFileSync(this.auditPath, 'utf8')) as AuditData;
+      const registro = data.files.find((f) => f.path === relPath);
       
       if (!registro) return false;
 

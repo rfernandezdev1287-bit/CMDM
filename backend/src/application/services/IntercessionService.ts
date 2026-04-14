@@ -97,7 +97,7 @@ export class IntercessionService {
     });
   }
 
-  private handleCaptureRequest(socket: any, seconds: number): void {
+  private handleCaptureRequest(socket: Socket, seconds: number): void {
     console.log(`[CMDM Intercesión]: Captura de contexto solicitada (${seconds}s)`);
     
     // 1. Recolectar Físicamente
