@@ -265,11 +265,21 @@ export const Dashboard = () => {
                 borderLeft: log.source === 'sys' ? '2px solid #00FFCC' : 'none',
                 borderRight: log.source === 'operador' ? '2px solid #FFD700' : 'none',
                 overflowWrap: 'anywhere',
-                wordBreak: 'break-word'
+                wordBreak: 'break-word',
+                display: 'flex',
+                gap: 1,
+                alignItems: 'flex-start'
               }}>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem', lineHeight: 1.5 }}>
+                <Typography variant="body2" sx={{ flexGrow: 1, fontFamily: 'monospace', fontSize: '0.85rem', lineHeight: 1.5 }}>
                   {log.text}
                 </Typography>
+                <IconButton 
+                  size="small" 
+                  onClick={() => copiarAlPortapapeles(log.text)}
+                  sx={{ p: 0.5, color: 'rgba(255,255,255,0.3)', '&:hover': { color: 'primary.main' } }}
+                >
+                  <ContentCopyIcon sx={{ fontSize: '0.9rem' }} />
+                </IconButton>
               </Box>
             ))}
           </Stack>

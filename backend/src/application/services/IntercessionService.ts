@@ -59,14 +59,14 @@ export class IntercessionService {
         console.log(`[CMDM Intercesión]: Orden recibida -> "${data.text}"`);
         this.commandRelay.registrarOrden(data.text, socket.id);
         
-        // Protocolo ST-09.0: Dualidad de Eco
+        // Protocolo ST-09.0: Dualidad de Eco (Unicast Táctico)
         // 1. Ack de Intercepción (Eco Táctico)
-        this.io.emit('bunker_response', { 
+        socket.emit('bunker_response', { 
           text: `Orden interceptada por el búnker de mando: "${data.text}"` 
         });
 
         // 2. Ejec de Materialización
-        this.io.emit('bunker_response', { 
+        socket.emit('bunker_response', { 
           text: `Orden materializada físicamente. Procediendo a la ejecución lógica.` 
         });
       });

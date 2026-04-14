@@ -45,6 +45,7 @@
 | 2026-04-14 | **ST-08: Blindaje de Jerarquía y Estética Gold** | 🟢 SELLADO |
 | 2026-04-14 | **ST-08.1/08.2: Remediación de Build y Linter** | 🟢 SELLADO |
 | 2026-04-14 | **ST-09.0: Sincronía Vocal y Arsenal de Cristal** | 🟢 SELLADO |
+| 2026-04-14 | **ST-09.2: Unicast Táctico y Soberanía Visual** | 🟢 SELLADO |
 
 ## 🧠 LECCIONES DE GUERRA (ST-05)
 - **Aprendizaje clave (Caveman v3):** La simplificación lingüística agresiva (eliminación de el/la/de/un) no compromete la lógica si se anclan los signos de interrogación y los verbos de deducción.
@@ -72,3 +73,6 @@ Verificación Socrática Final: Mon Apr 13 18:19:49 CST 2026 ffff
 - **Aprendizaje clave (ST-09.0):** El motor de voz (TTS) requiere un protocolo de **Encolamiento Nativo (Queue)**. El uso de `cancel()` preventivo aniquila la dualidad de respuesta (Ack + Exec) necesaria para la soberanía del Operador.
 - **Regla de evitación (ST-09.0):** Prohibido tratar código fuente como lenguaje natural. El Squeeze Engine debe implementar **Marcadores de Inviolabilidad** (`<<< ARTIFACT >>>`) para proteger los planos técnicos de la amputación Caveman.
 - **Lección Táctica (ST-09.0):** El botón de Stop debe ser absoluto, silenciando tanto el dictado como la cola de voz pendiente para devolver el control inmediato al Operador.
+- **Aprendizaje clave (ST-09.2):** El feedback táctico de comandos requiere un protocolo de **Unicast** (`socket.emit`). El uso de Broadcast (`io.emit`) genera duplicidad de eventos (Eco Fantasma) en redes con latencia o múltiples sesiones.
+- **Regla de evitación (ST-09.2):** Prohibido amputar herramientas de soberanía (Copy Icon) durante refactorizaciones estéticas; la ergonomía del Operador es innegociable.
+- **Protocolo de Rigor (ST-09.2):** Los Planes de Vuelo deben ser "Saciados" (completos), incluyendo análisis socrático y tabla de trazabilidad según la Ley RFDEV Módulo 0.
