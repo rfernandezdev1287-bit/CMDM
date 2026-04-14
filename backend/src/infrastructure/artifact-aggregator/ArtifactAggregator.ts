@@ -14,21 +14,38 @@ export class ArtifactAggregator {
   constructor(private readonly rootPath: string) {}
 
   /**
-   * Recolecta archivos modificados registrados por Git (uncommitted changes).
+   * Recolecta archivos modificados registrados por Git.
+   * ST-06.8: Incluye cambios pendientes Y archivos del último commit (HEAD^).
    */
   public recolectarArtefactos(): string {
     const resultados: string[] = [];
+    const uniqueFiles = new Set<string>();
     
     try {
-      // Usar git status --porcelain para obtener cambios atómicos (M, A, R)
+      // 1. Obtener cambios pendientes (M, A, R)
       const statusOutput = execSync('git status --porcelain', { cwd: this.rootPath }).toString();
-      const lines = statusOutput.split('\n');
+      statusOutput.split('\n').forEach(line => {
+        if (line.trim()) {
+          // El path es el segmento que sigue al estado (ej: "M src/app.ts")
+          const relPath = line.substring(3).trim();
+          uniqueFiles.add(relPath);
+        }
+      });
 
-      for (const line of lines) {
-        if (!line.trim()) continue;
-        
-        // El path es el segmento que sigue al estado (ej: "M src/app.ts")
-        const relPath = line.substring(3).trim();
+      // 2. Obtener archivos del último commit (lo que ya se modificó en el hito)
+      try {
+        const diffOutput = execSync('git diff HEAD^ HEAD --name-only', { cwd: this.rootPath }).toString();
+        diffOutput.split('\n').forEach(line => {
+          if (line.trim()) {
+            uniqueFiles.add(line.trim());
+          }
+        });
+      } catch (e) {
+        console.warn('[ArtifactAggregator]: No se pudo obtener diff HEAD^ (posible repo virgen).');
+      }
+
+      // 3. Procesar Contenido Físico
+      for (const relPath of uniqueFiles) {
         const fullPath = path.join(this.rootPath, relPath);
         const extension = path.extname(relPath).toLowerCase();
 

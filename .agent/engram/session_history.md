@@ -42,6 +42,8 @@
 | 2026-04-13 | **ST-04.8: Resolución de Conflicto SSL y Enlace Soberano** | 🟢 SELLADO |
 | 2026-04-13 | **ST-04.9: Refinamiento del Cerebro de Intercesión** | 🟢 SELLADO |
 | 2026-04-14 | **ST-05: Sincronía Inicial y Sello de Veracidad** | 🟢 SELLADO |
+| 2026-04-14 | **ST-08: Blindaje de Jerarquía y Estética Gold** | 🟢 SELLADO |
+| 2026-04-14 | **ST-08.1/08.2: Remediación de Build y Linter** | 🟢 SELLADO |
 
 ## 🧠 LECCIONES DE GUERRA (ST-05)
 - **Aprendizaje clave (Caveman v3):** La simplificación lingüística agresiva (eliminación de el/la/de/un) no compromete la lógica si se anclan los signos de interrogación y los verbos de deducción.
@@ -60,3 +62,9 @@ Certificación de Sincronización Socrática: Mon Apr 13 18:04:13 CST 2026
 Prueba Final de Sincronización (Fix contenido_bruto): Mon Apr 13 18:04:48 CST 2026
 Test Watcher: Mon Apr 13 18:11:24 CST 2026 test
 Verificación Socrática Final: Mon Apr 13 18:19:49 CST 2026 ffff
+- **Lección Táctica: Definición de Interacción (Soberanía del Operador)**: No se debe equiparar "línea" con "interacción". Una interacción en el CMDM es el binomio indisoluble (Comando + Respuesta). Calcular sincronía basándose en líneas planas es una violación de la soberanía contextual del Operador.
+- **Falla Forense: Verificación de Scroll y Jerarquía Flex**: Un reporte de "Verde Inmaculado" es un engaño si no se verifica físicamente que el contenedor tiene una restricción de altura (`min-height: 0`). El auto-scroll puede engañar a la vista ocultando que el contenedor se está expandiendo infinitamente.
+- **Protocolo de Verificación Rigurosa**: Antes de certificar, inyectar manualmente un volumen de datos que exceda el viewport y confirmar la aparición de la barra de scroll y el trigger de Lazy Loading.
+- **Aprendizaje clave (ST-08.0):** El blindaje de estanqueidad de texto (`overflow-wrap: anywhere`) es vital para evitar el colapso del búnker ante comandos sin espacios en viewports reducidos.
+- **Regla de evitación (ST-08.0):** Prohibido el `scroll-behavior: smooth` durante la expansión de historia prepended; el bypass a `auto` garantiza la estabilidad absoluta del scroll.
+- **Rigor de React 19 (ST-08.1/08.2):** Saneamos el build eliminando estados derivados innecesarios e implementando inicialización perezosa para sockets, garantizando un linter inmaculado.

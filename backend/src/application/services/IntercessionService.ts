@@ -84,9 +84,9 @@ export class IntercessionService {
           const fullContent = fs.readFileSync(historyPath, 'utf8');
           const lines = fullContent.split('\n').filter(l => !!l.trim());
           if (lines.length > 0) {
-            // Si es el espejo, queremos los últimos mensajes para el feeling de "chat"
-            // Si es el historial, las últimas 3 líneas
-            historyContent = lines.slice(-5).join('\n'); 
+            // ST-08.0: AJUSTE DE PROFUNDIDAD - 10 líneas (5 pares tácitos)
+            // Se reduce la saturación inicial reportada por el Operador.
+            historyContent = lines.slice(-10).join('\n'); 
             found = true;
             break;
           }
